@@ -1,4 +1,5 @@
-﻿using Bookstore.Domain.Addresses;
+﻿using System;
+using Bookstore.Domain.Addresses;
 using Bookstore.Domain.Authors;
 using Bookstore.Domain.Books;
 using Bookstore.Domain.Carts;
@@ -13,6 +14,11 @@ namespace Bookstore.Data
 {
     public partial class ApplicationDbContext : DbContext
     {
+        static ApplicationDbContext()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
+
         public ApplicationDbContext() { }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -42,6 +48,12 @@ namespace Bookstore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.HasDefaultSchema("bobsbookstore_dbo");
+
+            // Boolean property conversions for PostgreSQL NUMERIC(1,0) compatibility
+            modelBuilder.Entity<Address>().Property(x => x.IsActive).HasConversion<int>();
+            modelBuilder.Entity<ShoppingCartItem>().Property(x => x.WantToBuy).HasConversion<int>();
+
             modelBuilder.Entity<Customer>().HasIndex(x => x.Sub).IsUnique();
 
             modelBuilder.Entity<Book>().HasOne(x => x.Publisher).WithMany().HasForeignKey(x => x.PublisherId).OnDelete(DeleteBehavior.Restrict);
