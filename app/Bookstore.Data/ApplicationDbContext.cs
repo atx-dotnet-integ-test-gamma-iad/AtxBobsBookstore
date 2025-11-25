@@ -8,11 +8,17 @@ using Bookstore.Domain.Orders;
 using Bookstore.Domain.Products;
 using Bookstore.Domain.ReferenceData;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Bookstore.Data
 {
     public partial class ApplicationDbContext : DbContext
     {
+        static ApplicationDbContext()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
+
         public ApplicationDbContext() { }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -42,6 +48,23 @@ namespace Bookstore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Apply schema and table mappings
+            modelBuilder.Entity<Address>().ToTable("address", "bobsbookstore_dbo");
+            modelBuilder.Entity<Book>().ToTable("book", "bobsbookstore_dbo");
+            modelBuilder.Entity<Customer>().ToTable("customer", "bobsbookstore_dbo");
+            modelBuilder.Entity<Order>().ToTable("Order", "bobsbookstore_dbo");
+            modelBuilder.Entity<ShoppingCart>().ToTable("shoppingcart", "bobsbookstore_dbo");
+            modelBuilder.Entity<ShoppingCartItem>().ToTable("shoppingcartitem", "bobsbookstore_dbo");
+            modelBuilder.Entity<OrderItem>().ToTable("orderitem", "bobsbookstore_dbo");
+            modelBuilder.Entity<Offer>().ToTable("offer", "bobsbookstore_dbo");
+            modelBuilder.Entity<Author>().ToTable("author", "bobsbookstore_dbo");
+            modelBuilder.Entity<Product>().ToTable("product", "bobsbookstore_dbo");
+            modelBuilder.Entity<ReferenceDataItem>().ToTable("referencedata", "bobsbookstore_dbo");
+
+            // Apply boolean to int conversions for PostgreSQL NUMERIC(1,0) compatibility
+            modelBuilder.Entity<Address>().Property(e => e.IsActive).HasConversion<int>();
+            modelBuilder.Entity<ShoppingCartItem>().Property(e => e.WantToBuy).HasConversion<int>();
+
             modelBuilder.Entity<Customer>().HasIndex(x => x.Sub).IsUnique();
 
             modelBuilder.Entity<Book>().HasOne(x => x.Publisher).WithMany().HasForeignKey(x => x.PublisherId).OnDelete(DeleteBehavior.Restrict);
