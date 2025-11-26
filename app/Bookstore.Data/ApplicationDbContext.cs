@@ -1,4 +1,5 @@
-﻿using Bookstore.Domain.Addresses;
+using System;
+using Bookstore.Domain.Addresses;
 using Bookstore.Domain.Authors;
 using Bookstore.Domain.Books;
 using Bookstore.Domain.Carts;
@@ -13,6 +14,11 @@ namespace Bookstore.Data
 {
     public partial class ApplicationDbContext : DbContext
     {
+        static ApplicationDbContext()
+        {
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        }
+
         public ApplicationDbContext() { }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
@@ -34,7 +40,7 @@ namespace Bookstore.Data
         public DbSet<Offer> Offer { get; set; }
 
         public DbSet<Author> Author { get; set; }
-        
+
         public DbSet<Product> Product { get; set; }
 
 
@@ -42,6 +48,25 @@ namespace Bookstore.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Apply table mappings with schema
+            modelBuilder.Entity<Address>().ToTable("address", "bobsbookstore_dbo");
+            modelBuilder.Entity<Book>().ToTable("book", "bobsbookstore_dbo");
+            modelBuilder.Entity<Customer>().ToTable("customer", "bobsbookstore_dbo");
+            modelBuilder.Entity<Order>().ToTable("Order", "bobsbookstore_dbo");
+            modelBuilder.Entity<ShoppingCart>().ToTable("shoppingcart", "bobsbookstore_dbo");
+            modelBuilder.Entity<ShoppingCartItem>().ToTable("shoppingcartitem", "bobsbookstore_dbo");
+            modelBuilder.Entity<OrderItem>().ToTable("orderitem", "bobsbookstore_dbo");
+            modelBuilder.Entity<Offer>().ToTable("offer", "bobsbookstore_dbo");
+            modelBuilder.Entity<Author>().ToTable("author", "bobsbookstore_dbo");
+            modelBuilder.Entity<Product>().ToTable("product", "bobsbookstore_dbo");
+            modelBuilder.Entity<ReferenceDataItem>().ToTable("referencedata", "bobsbookstore_dbo");
+
+            // Apply boolean to int conversions for PostgreSQL
+            modelBuilder.Entity<Address>().Property(e => e.IsActive).HasConversion<int>();
+            modelBuilder.Entity<Book>().Property(e => e.IsInStock).HasConversion<int>();
+            modelBuilder.Entity<Book>().Property(e => e.IsLowInStock).HasConversion<int>();
+            modelBuilder.Entity<ShoppingCartItem>().Property(e => e.WantToBuy).HasConversion<int>();
+
             modelBuilder.Entity<Customer>().HasIndex(x => x.Sub).IsUnique();
 
             modelBuilder.Entity<Book>().HasOne(x => x.Publisher).WithMany().HasForeignKey(x => x.PublisherId).OnDelete(DeleteBehavior.Restrict);
