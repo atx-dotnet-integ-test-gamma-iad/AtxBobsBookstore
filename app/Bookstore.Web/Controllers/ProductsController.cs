@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,7 +31,10 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"EXEC [dbo].[uspGetProductData];";
+                // TODO: Manual review required - Equivalency status: ERROR (SQL Equivalency tool returned UNKNOWN for this conversion)
+                // Original SQL Server: EXEC [dbo].[uspGetProductData];
+                // Converted to PostgreSQL function call pattern with SELECT FROM
+                string sql = @"SELECT * FROM bobsbookstore_dbo.uspGetProductData();";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
             }
