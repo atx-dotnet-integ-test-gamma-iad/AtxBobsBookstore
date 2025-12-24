@@ -1,0 +1,141 @@
+{
+  "migration_report_version": "1.0",
+  "migration_date": "2024-12-24",
+  "migration_type": "SQL_Server_to_PostgreSQL",
+  "application_name": "Bob's Bookstore",
+  "summary_statistics": {
+    "total_sql_statements_processed": 5,
+    "statements_converted_by_dms": 0,
+    "statements_requiring_manual_intervention": 5,
+    "statements_validated_equivalent": 1,
+    "statements_validated_non_equivalent": 0,
+    "statements_with_equivalency_errors": 4
+  },
+  "detailed_statement_listing": [
+    {
+      "statement_id": 1,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 164,
+      "method_name": "EditUsingStoredProcedure",
+      "original_sql_server_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_postgresql_statement": "UPDATE bobsbookstore_dbo.author SET nationalidnumber = @NationalIDNumber, birthdate = @BirthDate, maritalstatus = @MaritalStatus, gender = @Gender WHERE businessentityid = @BusinessEntityID;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\\\"}\", \"error_timestamp\": \"2025-12-24T17:15:42.070930\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2025-12-24T17:19:50.769841\"}",
+      "reintegration_status": "SUCCESS"
+    },
+    {
+      "statement_id": 2,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 187,
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "original_sql_server_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_postgresql_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\\\"}\", \"error_timestamp\": \"2025-12-24T17:16:04.969845\"}",
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": "{\"equivalence_status\": \"EQUIVALENT\", \"result_details\": \"StructuralEquivalenceVerifier stage in formal methods proved equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2025-12-24T17:20:01.000347\"}",
+      "reintegration_status": "SUCCESS"
+    },
+    {
+      "statement_id": 3,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 202,
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "original_sql_server_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_postgresql_statement": "DELETE FROM bobsbookstore_dbo.author WHERE businessentityid = @BusinessEntityID;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\\\"}\", \"error_timestamp\": \"2025-12-24T17:16:27.183925\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2025-12-24T17:20:13.232401\"}",
+      "reintegration_status": "SUCCESS"
+    },
+    {
+      "statement_id": 4,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 219,
+      "method_name": "SelectAuthorsByHireYear",
+      "original_sql_server_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_postgresql_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\\\"}\", \"error_timestamp\": \"2025-12-24T17:16:49.962051\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2025-12-24T17:20:26.270568\"}",
+      "reintegration_status": "SUCCESS"
+    },
+    {
+      "statement_id": 5,
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "line_number": 31,
+      "method_name": "FindAllProducts",
+      "original_sql_server_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_postgresql_statement": "SELECT productid, name, productnumber, safetystocklevel FROM bobsbookstore_dbo.product;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\\\"}\", \"error_timestamp\": \"2025-12-24T17:17:12.167847\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2025-12-24T17:20:38.650503\"}",
+      "reintegration_status": "SUCCESS"
+    }
+  ],
+  "code_changes_summary": {
+    "files_modified": [
+      "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "app/Bookstore.Web/Controllers/ProductsController.cs"
+    ],
+    "sqlparameter_replacements": 7,
+    "sql_statements_replaced": 5,
+    "changes_detail": {
+      "AuthorsController.cs": {
+        "sql_statements_updated": 4,
+        "sqlparameter_to_npgsqlparameter": 7,
+        "methods_modified": [
+          "EditUsingStoredProcedure",
+          "FindAllAuthorsEmbeddedSql",
+          "DeleteAuthorEmbeddedSql",
+          "SelectAuthorsByHireYear"
+        ]
+      },
+      "ProductsController.cs": {
+        "sql_statements_updated": 1,
+        "sqlparameter_to_npgsqlparameter": 0,
+        "methods_modified": [
+          "FindAllProducts"
+        ]
+      }
+    }
+  },
+  "validation_results": {
+    "build_status": "SUCCESS",
+    "build_errors": 0,
+    "build_warnings": 53,
+    "build_output_summary": "Build succeeded with 0 errors and 53 warnings. Warnings are primarily pre-existing package vulnerabilities (Magick.NET-Q8-AnyCPU) and nullable reference type warnings, not introduced by this migration.",
+    "build_time_elapsed": "00:00:03.11"
+  },
+  "artifacts_created": [
+    "extracted_statements.sql",
+    "converted_statements.sql",
+    "sql_equivalency_validation_report.json",
+    "migration_report.json",
+    "build.log"
+  ],
+  "migration_notes": {
+    "dms_tool_usage": "All 5 SQL statements were attempted through the DMS MCP tool as required. All conversions failed with metadata model creation errors. Manual conversions were applied following PostgreSQL syntax rules while documenting DMS attempts.",
+    "equivalency_validation": "All 5 statement pairs were validated using the SQL Equivalency MCP tool. No agent judgment was used for equivalency determination. Tool returned EQUIVALENT for 1 statement and UNKNOWN (marked as ERROR per requirements) for 4 statements.",
+    "equivalency_status_field_explanation": "The 'equivalency_status' field contains the interpreted status per transformation definition requirements (UNKNOWN results from the SQL Equivalency tool are marked as ERROR). The exact output from the SQL Equivalency tool is preserved in the 'equivalency_tool_output' field for each statement. This ensures full transparency: the tool's actual determination is available in equivalency_tool_output, while equivalency_status reflects the transformation's required interpretation.",
+    "critical_conversions": [
+      "Stored procedure calls (uspUpdateAuthorPersonalInfo, uspDeleteAuthor, uspGetProductData) converted to direct SQL statements",
+      "SQL Server functions converted: FORMAT→TO_CHAR, DATEDIFF→DATE_PART(AGE), GETDATE→CURRENT_TIMESTAMP, DATEPART→EXTRACT",
+      "Schema names preserved as bobsbookstore_dbo (PostgreSQL convention)"
+    ],
+    "requirements_compliance": {
+      "all_statements_through_dms": true,
+      "all_statements_validated_equivalency": true,
+      "no_agent_judgment_for_equivalency": true,
+      "dms_failures_documented": true,
+      "manual_conversions_documented": true,
+      "equivalency_tool_output_preserved": true,
+      "transformation_requirements_followed": true
+    }
+  }
+}
