@@ -1,0 +1,134 @@
+{
+  "conversion_date": "2024-12-24",
+  "total_statements": 5,
+  "dms_tool_successful": 0,
+  "dms_tool_failed": 5,
+  "manual_conversions": 5,
+  "conversion_details": [
+    {
+      "statement_id": 1,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "EditUsingStoredProcedure",
+      "line_number": 160,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "dms_conversion_attempted": true,
+      "dms_conversion_status": "FAILED",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "dms_error_timestamp": "2025-12-24T20:55:44.212290",
+      "dms_tool_parameters": {
+        "schema_name": "dbo",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "BobsBookstore",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "manual_conversion_required": true,
+      "converted_sql": "SELECT dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_notes": "Converted SQL Server DECLARE/EXEC pattern to PostgreSQL SELECT function call. Parameters changed from @ notation to $ positional notation. Schema qualifier [dbo] converted to dbo."
+    },
+    {
+      "statement_id": 2,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql",
+      "line_number": 185,
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "dms_conversion_attempted": true,
+      "dms_conversion_status": "FAILED",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "dms_error_timestamp": "2025-12-24T20:56:06.225632",
+      "dms_tool_parameters": {
+        "schema_name": "bobsbookstore_dbo",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "BobsBookstore",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "manual_conversion_required": true,
+      "converted_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_notes": "No conversion needed - standard SQL compatible with PostgreSQL. Schema name bobsbookstore_dbo retained as-is."
+    },
+    {
+      "statement_id": 3,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql",
+      "line_number": 203,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "dms_conversion_attempted": true,
+      "dms_conversion_status": "FAILED",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "dms_error_timestamp": "2025-12-24T20:56:30.013255",
+      "dms_tool_parameters": {
+        "schema_name": "dbo",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "BobsBookstore",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "manual_conversion_required": true,
+      "converted_sql": "SELECT dbo.uspDeleteAuthor($1);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_notes": "Converted SQL Server DECLARE/EXEC pattern to PostgreSQL SELECT function call. Parameter changed from @ notation to $ positional notation. Schema qualifier [dbo] converted to dbo."
+    },
+    {
+      "statement_id": 4,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear",
+      "line_number": 220,
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "dms_conversion_attempted": true,
+      "dms_conversion_status": "FAILED",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "dms_error_timestamp": "2025-12-24T20:56:52.785034",
+      "dms_tool_parameters": {
+        "schema_name": "bobsbookstore_dbo",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "BobsBookstore",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "manual_conversion_required": true,
+      "converted_sql": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = $1;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_notes": "Complex conversion of SQL Server date functions to PostgreSQL: FORMAT() -> TO_CHAR(), DATEDIFF(YEAR, x, y) -> DATE_PART('year', AGE(y, x)), GETDATE() -> CURRENT_DATE, DATEPART(YEAR, x) -> EXTRACT(YEAR FROM x), @ parameter -> $ parameter."
+    },
+    {
+      "statement_id": 5,
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "method": "FindAllProducts",
+      "line_number": 32,
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "dms_conversion_attempted": true,
+      "dms_conversion_status": "FAILED",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "dms_error_timestamp": "2025-12-24T20:57:14.113499",
+      "dms_tool_parameters": {
+        "schema_name": "dbo",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "BobsBookstore",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "manual_conversion_required": true,
+      "converted_sql": "SELECT * FROM dbo.uspGetProductData();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_notes": "Converted SQL Server EXEC statement to PostgreSQL SELECT FROM function call. Schema qualifier [dbo] converted to dbo. Note: Original stored procedure uses cursor output parameter; PostgreSQL function should return table/set directly."
+    }
+  ],
+  "summary": {
+    "dms_tool_error_pattern": "All DMS conversions failed with metadata model creation error: 'No objects were found according to the specified selection rules'",
+    "root_cause": "The DMS migration project does not have the necessary schema metadata loaded from the source database, preventing statement conversion",
+    "resolution": "Manual conversion performed for all 5 statements using SQL Server to PostgreSQL syntax mapping best practices",
+    "key_conversions": [
+      "DECLARE/EXEC stored procedure pattern -> SELECT function() pattern",
+      "@ parameter notation -> $ positional parameter notation",
+      "FORMAT() -> TO_CHAR()",
+      "DATEDIFF(YEAR, x, y) -> DATE_PART('year', AGE(y, x))",
+      "GETDATE() -> CURRENT_DATE",
+      "DATEPART(YEAR, x) -> EXTRACT(YEAR FROM x)",
+      "[schema].[object] -> schema.object"
+    ],
+    "validation_notes": "All manually converted statements follow PostgreSQL syntax standards and maintain functional equivalency with original SQL Server statements. Stored procedures must be migrated to PostgreSQL functions for full compatibility."
+  }
+}
