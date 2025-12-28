@@ -1,0 +1,129 @@
+{
+  "conversion_summary": {
+    "total_statements": 5,
+    "dms_successful_conversions": 0,
+    "dms_failed_conversions": 5,
+    "manual_conversions_required": 5,
+    "conversion_timestamp": "2024-12-28T07:02:00Z"
+  },
+  "dms_tool_configuration": {
+    "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+    "database_name": "BobsBookstore",
+    "region": "us-east-1",
+    "server_name": "172.31.93.178"
+  },
+  "conversion_details": [
+    {
+      "statement_id": "STMT_001",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "conversion_status": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempt": {
+        "schema_name_tried": ["bobsbookstore_dbo", "dbo"],
+        "status": "error",
+        "error_message": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+        "error_timestamp": "2025-12-28T07:02:48.789357",
+        "workflow_step_failed": "create_metadata_model"
+      },
+      "manual_conversion_applied": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_reasoning": "DMS tool failed with metadata model creation error. Manually converted DECLARE/EXEC/SELECT pattern to PostgreSQL function call. Stored procedures in SQL Server are typically migrated to functions in PostgreSQL. The function call returns the result directly, eliminating the need for variable declaration and separate SELECT statement.",
+      "sql_server_features_converted": [
+        "DECLARE statement removed (not needed in PostgreSQL function calls)",
+        "EXEC with output parameter converted to SELECT function call",
+        "Schema name changed from [dbo] to bobsbookstore_dbo (per schema_mappings.json)",
+        "Function name converted to lowercase (PostgreSQL convention)"
+      ]
+    },
+    {
+      "statement_id": "STMT_002",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_status": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempt": {
+        "schema_name_tried": ["bobsbookstore_dbo", "dbo"],
+        "status": "error",
+        "error_message": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+        "error_timestamp": "2025-12-28T07:03:34.995625",
+        "workflow_step_failed": "create_metadata_model"
+      },
+      "manual_conversion_applied": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_reasoning": "DMS tool failed with metadata model creation error. This statement is already PostgreSQL compatible. The schema name bobsbookstore_dbo is correct per schema_mappings.json (source dbo maps to target bobsbookstore_dbo). Table name 'author' is lowercase which follows PostgreSQL conventions.",
+      "sql_server_features_converted": [
+        "Statement is already PostgreSQL compatible",
+        "Schema name bobsbookstore_dbo retained as-is",
+        "No conversion needed"
+      ]
+    },
+    {
+      "statement_id": "STMT_003",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "conversion_status": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempt": {
+        "schema_name_tried": ["bobsbookstore_dbo", "dbo"],
+        "status": "error",
+        "error_message": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+        "error_timestamp": "2025-12-28T07:03:57.427285",
+        "workflow_step_failed": "create_metadata_model"
+      },
+      "manual_conversion_applied": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_reasoning": "DMS tool failed with metadata model creation error. Manually converted DECLARE/EXEC/SELECT pattern to PostgreSQL function call. Similar to STMT_001, stored procedures are converted to functions in PostgreSQL. The function call returns the result directly.",
+      "sql_server_features_converted": [
+        "DECLARE statement removed",
+        "EXEC with output parameter converted to SELECT function call",
+        "Schema name changed from [dbo] to bobsbookstore_dbo",
+        "Function name converted to lowercase"
+      ]
+    },
+    {
+      "statement_id": "STMT_004",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "conversion_status": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempt": {
+        "schema_name_tried": ["bobsbookstore_dbo", "dbo"],
+        "status": "error",
+        "error_message": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+        "error_timestamp": "2025-12-28T07:04:20.180594",
+        "workflow_step_failed": "create_metadata_model"
+      },
+      "manual_conversion_applied": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "conversion_reasoning": "DMS tool failed with metadata model creation error. This statement required significant conversion of SQL Server-specific date/time functions to PostgreSQL equivalents. FORMAT -> TO_CHAR with PostgreSQL format codes (HH24 for 24-hour format). DATEDIFF(YEAR,...) -> EXTRACT(YEAR FROM AGE(...)). GETDATE() -> CURRENT_TIMESTAMP. DATEPART -> EXTRACT. All column names converted to lowercase for PostgreSQL convention.",
+      "sql_server_features_converted": [
+        "FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') -> TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS')",
+        "DATEDIFF(YEAR, BirthDate, GETDATE()) -> EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate))",
+        "GETDATE() -> CURRENT_TIMESTAMP",
+        "DATEPART(YEAR, HireDate) -> EXTRACT(YEAR FROM hiredate)",
+        "Column names converted to lowercase (BusinessEntityID -> businessentityid, etc.)"
+      ]
+    },
+    {
+      "statement_id": "STMT_005",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "conversion_status": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempt": {
+        "schema_name_tried": ["bobsbookstore_dbo", "dbo"],
+        "status": "error",
+        "error_message": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+        "error_timestamp": "2025-12-28T07:04:42.296324",
+        "workflow_step_failed": "create_metadata_model"
+      },
+      "manual_conversion_applied": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_reasoning": "DMS tool failed with metadata model creation error. Manually converted EXEC statement to PostgreSQL function call. In PostgreSQL, stored procedures that return result sets are implemented as functions and called using SELECT * FROM function_name(). This pattern is used when the stored procedure returns a table result set.",
+      "sql_server_features_converted": [
+        "EXEC statement converted to SELECT * FROM function call",
+        "Schema name changed from [dbo] to bobsbookstore_dbo",
+        "Function name converted to lowercase",
+        "Added empty parentheses for function call syntax"
+      ]
+    }
+  ],
+  "common_issues_encountered": {
+    "dms_tool_error": "Metadata model creation failed for all statements",
+    "error_reason": "No objects were found according to the specified selection rules in the DMS migration project",
+    "resolution": "All statements were manually converted following PostgreSQL best practices and SQL Server to PostgreSQL migration patterns"
+  },
+  "conversion_patterns_applied": {
+    "stored_procedures": "SQL Server EXEC statements converted to PostgreSQL SELECT function_name() calls",
+    "date_functions": "SQL Server date functions (FORMAT, DATEDIFF, GETDATE, DATEPART) converted to PostgreSQL equivalents (TO_CHAR, EXTRACT/AGE, CURRENT_TIMESTAMP, EXTRACT)",
+    "schema_names": "SQL Server [dbo] schema converted to PostgreSQL bobsbookstore_dbo schema per schema_mappings.json",
+    "naming_conventions": "Function and column names converted to lowercase following PostgreSQL conventions",
+    "variable_declarations": "SQL Server DECLARE statements removed where not needed in PostgreSQL function calls"
+  }
+}
