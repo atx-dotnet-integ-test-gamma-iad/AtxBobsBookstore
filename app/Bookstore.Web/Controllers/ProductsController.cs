@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,7 +31,9 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"EXEC [dbo].[uspGetProductData];";
+                // Note: The stored procedure [dbo].[uspGetProductData] must be migrated to PostgreSQL as a function.
+                // PostgreSQL function call syntax - assumes the function exists in the target database
+                string sql = @"SELECT * FROM bobsbookstore_dbo.uspGetProductData();";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
             }
