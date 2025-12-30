@@ -1,0 +1,178 @@
+=============================================================================
+DMS CONVERSION LOG
+Conversion Date: 2024-12-30
+Tool: dms-mcp____statement_conversion_tool
+Total Statements: 5
+=============================================================================
+
+-----------------------------------------------------------------------------
+STATEMENT 1: EditUsingStoredProcedure - Stored Procedure Call
+-----------------------------------------------------------------------------
+Timestamp: 2025-12-30T06:18:20.954550
+Schema Name: bobsbookstore_dbo
+Status: ERROR - Manual conversion required
+
+Original SQL:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+DMS Tool Input:
+{
+  "sql_text": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\nSELECT @rowsAffected;",
+  "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+  "database_name": "BobsBookstore",
+  "schema_name": "dbo",
+  "region": "us-east-1",
+  "server_name": "172.31.93.178"
+}
+
+DMS Tool Output:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Error Details: Metadata model creation failed - no objects found according to selection rules
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool unable to create metadata model for stored procedure conversion
+
+-----------------------------------------------------------------------------
+STATEMENT 2: FindAllAuthorsEmbeddedSql - Simple SELECT
+-----------------------------------------------------------------------------
+Timestamp: 2025-12-30T06:18:44.458406
+Schema Name: bobsbookstore_dbo
+Status: ERROR - Manual conversion required
+
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author;
+
+DMS Tool Input:
+{
+  "sql_text": "SELECT * FROM bobsbookstore_dbo.author;",
+  "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+  "database_name": "BobsBookstore",
+  "schema_name": "dbo",
+  "region": "us-east-1",
+  "server_name": "172.31.93.178"
+}
+
+DMS Tool Output:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Error Details: Metadata model creation failed - no objects found according to selection rules
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool unable to create metadata model, though this SELECT is already PostgreSQL-compatible
+
+-----------------------------------------------------------------------------
+STATEMENT 3: DeleteAuthorEmbeddedSql - Stored Procedure Call
+-----------------------------------------------------------------------------
+Timestamp: 2025-12-30T06:19:07.765693
+Schema Name: bobsbookstore_dbo
+Status: ERROR - Manual conversion required
+
+Original SQL:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+DMS Tool Input:
+{
+  "sql_text": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\nSELECT @rowsAffected;",
+  "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+  "database_name": "BobsBookstore",
+  "schema_name": "dbo",
+  "region": "us-east-1",
+  "server_name": "172.31.93.178"
+}
+
+DMS Tool Output:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Error Details: Metadata model creation failed - no objects found according to selection rules
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool unable to create metadata model for stored procedure conversion
+
+-----------------------------------------------------------------------------
+STATEMENT 4: SelectAuthorsByHireYear - Complex SELECT with SQL Server Functions
+-----------------------------------------------------------------------------
+Timestamp: 2025-12-30T06:19:32.320459
+Schema Name: bobsbookstore_dbo
+Status: ERROR - Manual conversion required
+
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Input:
+{
+  "sql_text": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+  "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+  "database_name": "BobsBookstore",
+  "schema_name": "dbo",
+  "region": "us-east-1",
+  "server_name": "172.31.93.178"
+}
+
+DMS Tool Output:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Error Details: Metadata model creation failed - no objects found according to selection rules
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool unable to create metadata model; requires conversion of SQL Server-specific functions (FORMAT, DATEDIFF, GETDATE, DATEPART)
+
+-----------------------------------------------------------------------------
+STATEMENT 5: FindAllProducts - Stored Procedure Call
+-----------------------------------------------------------------------------
+Timestamp: 2025-12-30T06:19:55.571699
+Schema Name: bobsbookstore_dbo
+Status: ERROR - Manual conversion required
+
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Input:
+{
+  "sql_text": "EXEC [dbo].[uspGetProductData];",
+  "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+  "database_name": "BobsBookstore",
+  "schema_name": "dbo",
+  "region": "us-east-1",
+  "server_name": "172.31.93.178"
+}
+
+DMS Tool Output:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Error Details: Metadata model creation failed - no objects found according to selection rules
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool unable to create metadata model for stored procedure conversion
+
+=============================================================================
+SUMMARY
+=============================================================================
+Total Statements Processed: 5
+DMS Success: 0
+DMS Failures: 5
+Manual Conversions Required: 5
+
+Common Error: All statements failed with "Metadata model creation failed: No objects were found according to the specified selection rules"
+
+Note: All statements were attempted through DMS tool first as per migration requirements. Manual conversions will be applied based on PostgreSQL best practices while maintaining functional equivalence.
+=============================================================================
