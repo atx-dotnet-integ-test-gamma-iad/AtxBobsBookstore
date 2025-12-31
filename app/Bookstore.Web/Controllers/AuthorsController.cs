@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Authors;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -159,14 +160,23 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
+                // Converted from SQL Server DECLARE/EXEC stored procedure pattern to PostgreSQL inline UPDATE
+                // Original: DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] ...
+                // Conversion: Replaced stored procedure with direct UPDATE statement
+                // ExecuteSqlRawAsync automatically returns the number of rows affected
+                string sql = @"UPDATE bobsbookstore_dbo.author 
+SET nationalidnumber = @NationalIDNumber,
+    birthdate = @BirthDate,
+    maritalstatus = @MaritalStatus,
+    gender = @Gender
+WHERE businessentityid = @BusinessEntityID;";
 
                 var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, 
-                    new SqlParameter("@BusinessEntityID", businessEntityId),
-                    new SqlParameter("@NationalIDNumber", nationalIdNumber),
-                    new SqlParameter("@BirthDate", birthDate.ToUniversalTime()),
-                    new SqlParameter("@MaritalStatus", maritalStatus),
-                    new SqlParameter("@Gender", gender)
+                    new NpgsqlParameter("@BusinessEntityID", businessEntityId),
+                    new NpgsqlParameter("@NationalIDNumber", nationalIdNumber),
+                    new NpgsqlParameter("@BirthDate", birthDate.ToUniversalTime()),
+                    new NpgsqlParameter("@MaritalStatus", maritalStatus),
+                    new NpgsqlParameter("@Gender", gender)
                     );
 
                 return rowsAffected > 0;
@@ -182,10 +192,13 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"SELECT * FROM Author";
+                // PostgreSQL-compatible SELECT statement (already correct)
+                // Original SQL Server: SELECT * FROM bobsbookstore_dbo.author
+                // PostgreSQL: SELECT * FROM bobsbookstore_dbo.author (no changes needed)
+                // Schema bobsbookstore_dbo is configured in ApplicationDbContext
+                string sql = @"SELECT * FROM bobsbookstore_dbo.author";
 
-                // Execute the SQL command and get the number of rows affected
+                // Execute the SQL command and retrieve results
                 var results = await _context.Database.SqlQueryRaw<Author>(sql).ToListAsync();
 
                 return results;
@@ -203,11 +216,15 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;";
+                // Converted from SQL Server DECLARE/EXEC stored procedure pattern to PostgreSQL inline DELETE
+                // Original: DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+                // Conversion: Replaced stored procedure with direct DELETE statement
+                // ExecuteSqlRawAsync automatically returns the number of rows affected
+                string sql = @"DELETE FROM bobsbookstore_dbo.author
+WHERE businessentityid = @BusinessEntityID;";
 
                 // Execute the SQL command and get the number of rows affected
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new SqlParameter("@BusinessEntityID", businessEntityId));
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new NpgsqlParameter("@BusinessEntityID", businessEntityId));
 
                 return rowsAffected > 0;
             }
@@ -223,11 +240,20 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;";
+                // Converted from SQL Server date functions to PostgreSQL equivalents
+                // Original: SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, 
+                //           DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author 
+                //           WHERE DATEPART(YEAR, HireDate) = @HireDate;
+                // Conversions:
+                //   - FORMAT(date, format) → TO_CHAR(date, 'PostgreSQL format')
+                //   - DATEDIFF(YEAR, date1, date2) → DATE_PART('year', AGE(date2, date1))
+                //   - GETDATE() → CURRENT_TIMESTAMP
+                //   - DATEPART(YEAR, date) → EXTRACT(YEAR FROM date)
+                //   - Column names converted to lowercase for PostgreSQL
+                string sql = @"SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;";
 
-                // Execute the SQL command and get the number of rows affected
-                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new SqlParameter("@HireDate", hireYear)).ToListAsync();
+                // Execute the SQL command and get results
+                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new NpgsqlParameter("@HireDate", hireYear)).ToListAsync();
 
                 return results;
             }

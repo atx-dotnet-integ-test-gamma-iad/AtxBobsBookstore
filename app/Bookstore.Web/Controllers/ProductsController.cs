@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,7 +31,12 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"EXEC [dbo].[uspGetProductData];";
+                // Converted from SQL Server cursor-based stored procedure to PostgreSQL SELECT
+                // Original: EXEC [dbo].[uspGetProductData];
+                // The stored procedure used SQL Server OUTPUT cursor which is not needed in PostgreSQL
+                // Conversion: Replaced with direct SELECT statement
+                string sql = @"SELECT productid, name, productnumber, safetystocklevel 
+FROM bobsbookstore_dbo.product;";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
             }
