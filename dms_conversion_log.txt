@@ -1,0 +1,880 @@
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================
+DMS MCP TOOL CONVERSION LOG
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================
+Purpose: Detailed log of all DMS tool interactions for SQL Server to PostgreSQL migration
+Date: 2026-01-01
+Total Statements: 5
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================
+
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================
+STATEMENT 1: Update Author Using Stored Procedure
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:55:26.841991",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(
+    @BusinessEntityID::integer,
+    @NationalIDNumber::text,
+    @BirthDate::timestamp,
+    @MaritalStatus::text,
+    @Gender::text
+);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter types made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:16.708092",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No changes needed
+- Schema reference bobsbookstore_dbo.author remains the same
+
+================================================================================
+
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:32.449572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);
+
+Conversion Notes:
+- T-SQL DECLARE/EXEC pattern converted to direct function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Return value captured directly from function
+- Parameter type made explicit for PostgreSQL
+
+================================================================================
+
+STATEMENT 4: Select Authors by Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: bobsbookstore_dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:56:48.560165",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- GETDATE() converted to NOW()
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Format pattern adjusted: 'yyyy-MM-dd HH:mm:ss' to 'YYYY-MM-DD HH24:MI:SS'
+
+================================================================================
+
+STATEMENT 5: Get All Products Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- region: us-east-1
+- schema_name: dbo
+- sql_text: [Full SQL above]
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-01T00:57:04.307166",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}"
+}
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool failed with metadata model creation error - no objects found
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- T-SQL EXEC pattern converted to SELECT FROM function call
+- SQL Server stored procedure becomes PostgreSQL function
+- Schema changed from [dbo] to bobsbookstore_dbo
+- Function call requires () even with no parameters
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
+Summary:
+- Total Statements: 5
+- Successfully Converted by DMS Tool: 0
+- Manually Converted After DMS Failure: 5
+- DMS Error: Metadata model creation failed - no objects found
+- All statements manually converted using best judgment based on PostgreSQL standards
+================================================================================

@@ -1,0 +1,93 @@
+================================================================================
+PARAMETER MIGRATION LOG
+================================================================================
+Purpose: Document all SqlParameter to NpgsqlParameter replacements
+Date: 2026-01-01
+Total Replacements: 7 instances in AuthorsController.cs
+================================================================================
+
+================================================================================
+FILE: AuthorsController.cs
+================================================================================
+
+Replacement 1: Line ~166 (EditUsingStoredProcedure)
+---------------------------------------------------
+BEFORE: new SqlParameter("@BusinessEntityID", businessEntityId)
+AFTER:  new NpgsqlParameter("@BusinessEntityID", businessEntityId)
+Context: uspUpdateAuthorPersonalInfo stored procedure call parameter
+Parameter Type: integer
+
+Replacement 2: Line ~167 (EditUsingStoredProcedure)
+---------------------------------------------------
+BEFORE: new SqlParameter("@NationalIDNumber", nationalIdNumber)
+AFTER:  new NpgsqlParameter("@NationalIDNumber", nationalIdNumber)
+Context: uspUpdateAuthorPersonalInfo stored procedure call parameter
+Parameter Type: text/string
+
+Replacement 3: Line ~168 (EditUsingStoredProcedure)
+---------------------------------------------------
+BEFORE: new SqlParameter("@BirthDate", birthDate.ToUniversalTime())
+AFTER:  new NpgsqlParameter("@BirthDate", birthDate.ToUniversalTime())
+Context: uspUpdateAuthorPersonalInfo stored procedure call parameter
+Parameter Type: timestamp
+Note: ToUniversalTime() conversion maintained for UTC timestamp
+
+Replacement 4: Line ~169 (EditUsingStoredProcedure)
+---------------------------------------------------
+BEFORE: new SqlParameter("@MaritalStatus", maritalStatus)
+AFTER:  new NpgsqlParameter("@MaritalStatus", maritalStatus)
+Context: uspUpdateAuthorPersonalInfo stored procedure call parameter
+Parameter Type: text/char
+
+Replacement 5: Line ~170 (EditUsingStoredProcedure)
+---------------------------------------------------
+BEFORE: new SqlParameter("@Gender", gender)
+AFTER:  new NpgsqlParameter("@Gender", gender)
+Context: uspUpdateAuthorPersonalInfo stored procedure call parameter
+Parameter Type: text/char
+
+Replacement 6: Line ~211 (DeleteAuthorEmbeddedSql)
+---------------------------------------------------
+BEFORE: new SqlParameter("@BusinessEntityID", businessEntityId)
+AFTER:  new NpgsqlParameter("@BusinessEntityID", businessEntityId)
+Context: uspDeleteAuthor stored procedure call parameter
+Parameter Type: integer
+
+Replacement 7: Line ~236 (SelectAuthorsByHireYear)
+---------------------------------------------------
+BEFORE: new SqlParameter("@HireDate", hireYear)
+AFTER:  new NpgsqlParameter("@HireDate", hireYear)
+Context: SelectAuthorsByHireYear query parameter
+Parameter Type: integer
+
+================================================================================
+FILE: ProductsController.cs
+================================================================================
+No SqlParameter instances found - file already uses correct namespace
+
+================================================================================
+VERIFICATION
+================================================================================
+Using Statements Verified:
+✓ AuthorsController.cs has 'using Npgsql;'
+✓ ProductsController.cs has 'using Npgsql;'
+✓ No 'using System.Data.SqlClient;' or 'using Microsoft.Data.SqlClient;' found
+
+Parameter Constructor Compatibility:
+✓ NpgsqlParameter supports same constructors as SqlParameter
+✓ Parameter names match PostgreSQL statement placeholders (@ prefix compatible)
+✓ All parameter value conversions maintained (ToUniversalTime())
+
+Parameter Bindings:
+✓ @BusinessEntityID → businessEntityId (integer)
+✓ @NationalIDNumber → nationalIdNumber (text)
+✓ @BirthDate → birthDate.ToUniversalTime() (timestamp)
+✓ @MaritalStatus → maritalStatus (text)
+✓ @Gender → gender (text)
+✓ @HireDate → hireYear (integer)
+
+All 7 SqlParameter instances successfully replaced with NpgsqlParameter.
+
+================================================================================
+END OF PARAMETER MIGRATION LOG
+================================================================================

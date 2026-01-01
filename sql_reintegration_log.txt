@@ -1,0 +1,156 @@
+================================================================================
+SQL RE-INTEGRATION LOG
+================================================================================
+Purpose: Document all SQL statement replacements in source code
+Date: 2026-01-01
+Total Replacements: 5 (4 in AuthorsController.cs, 1 in ProductsController.cs)
+================================================================================
+
+================================================================================
+REPLACEMENT 1: AuthorsController.cs - EditUsingStoredProcedure (Line 158)
+================================================================================
+Method: EditUsingStoredProcedure
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Line: ~158
+
+BEFORE (MS SQL Server):
+--------------------------------------------------------------------------------
+string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
+
+AFTER (PostgreSQL):
+--------------------------------------------------------------------------------
+string sql = @"SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID::integer, @NationalIDNumber::text, @BirthDate::timestamp, @MaritalStatus::text, @Gender::text);";
+
+Changes Applied:
+- Removed DECLARE @rowsAffected INT pattern
+- Converted EXEC to SELECT function call
+- Changed schema from [dbo] to bobsbookstore_dbo
+- Added explicit type casting for parameters (::integer, ::text, ::timestamp)
+- Removed final SELECT @rowsAffected pattern
+
+Parameter Bindings Preserved:
+- @BusinessEntityID (businessEntityId)
+- @NationalIDNumber (nationalIdNumber)
+- @BirthDate (birthDate.ToUniversalTime())
+- @MaritalStatus (maritalStatus)
+- @Gender (gender)
+
+================================================================================
+REPLACEMENT 2: AuthorsController.cs - FindAllAuthorsEmbeddedSql (Line 184)
+================================================================================
+Method: FindAllAuthorsEmbeddedSql
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Line: ~184
+
+BEFORE (MS SQL Server):
+--------------------------------------------------------------------------------
+string sql = @"SELECT * FROM bobsbookstore_dbo.author";
+
+AFTER (PostgreSQL):
+--------------------------------------------------------------------------------
+string sql = @"SELECT * FROM bobsbookstore_dbo.author";
+
+Changes Applied:
+- No changes required - already PostgreSQL compatible
+- Schema name bobsbookstore_dbo maintained
+
+================================================================================
+REPLACEMENT 3: AuthorsController.cs - DeleteAuthorEmbeddedSql (Line 207)
+================================================================================
+Method: DeleteAuthorEmbeddedSql
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Line: ~207
+
+BEFORE (MS SQL Server):
+--------------------------------------------------------------------------------
+string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;";
+
+AFTER (PostgreSQL):
+--------------------------------------------------------------------------------
+string sql = @"SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID::integer);";
+
+Changes Applied:
+- Removed DECLARE @rowsAffected INT pattern
+- Converted EXEC to SELECT function call
+- Changed schema from [dbo] to bobsbookstore_dbo
+- Added explicit type casting for parameter (::integer)
+- Removed final SELECT @rowsAffected pattern
+
+Parameter Bindings Preserved:
+- @BusinessEntityID (businessEntityId)
+
+================================================================================
+REPLACEMENT 4: AuthorsController.cs - SelectAuthorsByHireYear (Line 227)
+================================================================================
+Method: SelectAuthorsByHireYear
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Line: ~227
+
+BEFORE (MS SQL Server):
+--------------------------------------------------------------------------------
+string sql = @"SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;";
+
+AFTER (PostgreSQL):
+--------------------------------------------------------------------------------
+string sql = @"SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    EXTRACT(YEAR FROM AGE(NOW(), BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;";
+
+Changes Applied:
+- FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') → TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS')
+- DATEDIFF(YEAR, BirthDate, GETDATE()) → EXTRACT(YEAR FROM AGE(NOW(), BirthDate))
+- DATEPART(YEAR, HireDate) → EXTRACT(YEAR FROM HireDate)
+- Date format pattern adjusted for PostgreSQL
+- Maintained column aliases: FormattedModifiedDate, Age
+
+Parameter Bindings Preserved:
+- @HireDate (hireYear)
+
+================================================================================
+REPLACEMENT 5: ProductsController.cs - FindAllProducts (Line 31)
+================================================================================
+Method: FindAllProducts
+File: app/Bookstore.Web/Controllers/ProductsController.cs
+Line: ~31
+
+BEFORE (MS SQL Server):
+--------------------------------------------------------------------------------
+string sql = @"EXEC [dbo].[uspGetProductData];";
+
+AFTER (PostgreSQL):
+--------------------------------------------------------------------------------
+string sql = @"SELECT * FROM bobsbookstore_dbo.uspGetProductData();";
+
+Changes Applied:
+- Converted EXEC to SELECT FROM function call
+- Changed schema from [dbo] to bobsbookstore_dbo
+- Added parentheses () for function call
+
+Parameter Bindings:
+- None (no parameters)
+
+================================================================================
+VERIFICATION NOTES
+================================================================================
+Code Structure Verification:
+✓ All method signatures unchanged
+✓ Try-catch blocks maintained
+✓ Parameter bindings preserved
+✓ Return types consistent
+✓ No hardcoded SQL Server schema names remain ([dbo] → bobsbookstore_dbo)
+
+Schema Object Changes:
+- All [dbo] references converted to bobsbookstore_dbo
+- Stored procedure calls converted to PostgreSQL function calls
+- No table/procedure renames from DMS (DMS conversion failed, manual conversion applied)
+
+Files Modified:
+- app/Bookstore.Web/Controllers/AuthorsController.cs (4 replacements)
+- app/Bookstore.Web/Controllers/ProductsController.cs (1 replacement)
+
+================================================================================
+END OF SQL RE-INTEGRATION LOG
+================================================================================
