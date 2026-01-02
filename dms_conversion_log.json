@@ -1,0 +1,100 @@
+{
+  "conversion_timestamp": "2026-01-02T13:06:50",
+  "total_statements": 4,
+  "dms_tool_parameters": {
+    "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+    "region": "us-east-1",
+    "database_name": "BobsBookstore",
+    "server_name": "172.31.93.178"
+  },
+  "conversions": [
+    {
+      "statement_id": 1,
+      "statement_name": "FindAllAuthorsEmbeddedSql",
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "file_location": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": "~189",
+      "method_name": "FindAllAuthorsEmbeddedSql()",
+      "dms_input": {
+        "sql_text": "SELECT * FROM bobsbookstore_dbo.author",
+        "schema_name": "bobsbookstore_dbo"
+      },
+      "dms_status": "ERROR",
+      "dms_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: No objects were found according to the specified selection rules",
+        "error_timestamp": "2026-01-02T13:07:05"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reason": "DMS tool could not find schema objects. Applying standard PostgreSQL conversion for schema-qualified table reference.",
+      "converted_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_notes": "Schema name bobsbookstore_dbo.author remains unchanged as it's already PostgreSQL compatible. The schema was already converted during database migration."
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "EditUsingStoredProcedure",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "file_location": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": "~161",
+      "method_name": "EditUsingStoredProcedure()",
+      "dms_input": {
+        "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+        "schema_name": "dbo"
+      },
+      "dms_status": "ERROR",
+      "dms_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: No objects were found according to the specified selection rules",
+        "error_timestamp": "2026-01-02T13:07:45"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reason": "DMS tool could not find schema objects. Converting SQL Server stored procedure call to PostgreSQL function call pattern.",
+      "converted_sql": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5)",
+      "conversion_notes": "Converted SQL Server stored procedure call with output parameter to PostgreSQL function call. SQL Server uses [dbo].[uspUpdateAuthorPersonalInfo] which becomes bobsbookstore_dbo.uspupdateauthorpersonalinfo in PostgreSQL (lowercase). Parameters use positional syntax ($1, $2, etc). The function should return the rows affected value."
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "file_location": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": "~207",
+      "method_name": "DeleteAuthorEmbeddedSql()",
+      "dms_input": {
+        "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+        "schema_name": "dbo"
+      },
+      "dms_status": "ERROR",
+      "dms_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: No objects were found according to the specified selection rules",
+        "error_timestamp": "2026-01-02T13:08:00"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reason": "DMS tool could not find schema objects. Converting SQL Server stored procedure call to PostgreSQL function call pattern.",
+      "converted_sql": "SELECT bobsbookstore_dbo.uspdeleteauthor($1)",
+      "conversion_notes": "Converted SQL Server stored procedure call with output parameter to PostgreSQL function call. SQL Server uses [dbo].[uspDeleteAuthor] which becomes bobsbookstore_dbo.uspdeleteauthor in PostgreSQL (lowercase). Parameter uses positional syntax ($1). The function should return the rows affected value."
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "file_location": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": "~226",
+      "method_name": "SelectAuthorsByHireYear()",
+      "dms_input": {
+        "sql_text": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+        "schema_name": "bobsbookstore_dbo"
+      },
+      "dms_status": "ERROR",
+      "dms_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: No objects were found according to the specified selection rules",
+        "error_timestamp": "2026-01-02T13:08:15"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reason": "DMS tool could not find schema objects. Converting SQL Server date functions to PostgreSQL equivalents.",
+      "converted_sql": "SELECT \"businessentityid\", TO_CHAR(\"modifieddate\", 'YYYY-MM-DD HH24:MI:SS') AS \"formattedmodifieddate\", DATE_PART('year', AGE(CURRENT_DATE, \"birthdate\")) AS \"age\" FROM bobsbookstore_dbo.author WHERE DATE_PART('year', \"hiredate\") = $1;",
+      "conversion_notes": "Converted SQL Server-specific functions to PostgreSQL: FORMAT() to TO_CHAR(), DATEDIFF(YEAR,...) to DATE_PART('year', AGE(...)), GETDATE() to CURRENT_DATE, DATEPART(YEAR,...) to DATE_PART('year',...). Column names converted to lowercase with quotes for case-sensitivity. Parameter changed from @HireDate to $1."
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+=============================================================================
+SCHEMA OBJECT NAME MAPPING
+SQL Server to PostgreSQL Migration
+Date: 2026-01-02
+=============================================================================
+
+SCHEMA TRANSFORMATIONS
+-----------------------
+SQL Server Schema: dbo
+PostgreSQL Schema: bobsbookstore_dbo
+
+Rationale: The PostgreSQL database uses a prefixed schema name 
+(bobsbookstore_dbo) instead of the default 'dbo' schema from SQL Server.
+
+TABLE MAPPINGS
+---------------
+SQL Server: [dbo].[Author]
+PostgreSQL: bobsbookstore_dbo.author
+
+Notes: 
+- Bracket notation [schema].[table] removed (PostgreSQL uses dots)
+- Table name converted to lowercase (PostgreSQL convention)
+- Schema prefix maintained in qualified name
+
+STORED PROCEDURE/FUNCTION MAPPINGS
+-----------------------------------
+SQL Server Stored Procedure: [dbo].[uspUpdateAuthorPersonalInfo]
+PostgreSQL Function: bobsbookstore_dbo.uspupdateauthorpersonalinfo
+
+SQL Server Stored Procedure: [dbo].[uspDeleteAuthor]
+PostgreSQL Function: bobsbookstore_dbo.uspdeleteauthor
+
+Notes:
+- SQL Server stored procedures converted to PostgreSQL functions
+- Bracket notation removed
+- Function names converted to lowercase
+- Schema prefix changed from dbo to bobsbookstore_dbo
+- Calling convention changed from EXEC to SELECT function()
+
+PARAMETER SYNTAX TRANSFORMATIONS
+----------------------------------
+SQL Server: Named parameters with @ prefix
+  Examples: @BusinessEntityID, @NationalIDNumber, @BirthDate, @HireDate
+
+PostgreSQL: Positional parameters with $ prefix
+  Examples: $1, $2, $3, $4, $5
+
+Notes:
+- NpgsqlParameter handles automatic conversion from named to positional
+- Code continues to use named parameters in NpgsqlParameter constructor
+- Npgsql driver translates to positional parameters at runtime
+
+COLUMN NAME TRANSFORMATIONS
+-----------------------------
+SQL Server: Mixed case column names (PascalCase)
+  Examples: BusinessEntityID, ModifiedDate, BirthDate, HireDate
+
+PostgreSQL: Lowercase column names with double quotes
+  Examples: "businessentityid", "modifieddate", "birthdate", "hiredate"
+
+Notes:
+- PostgreSQL is case-insensitive for unquoted identifiers (folds to lowercase)
+- Double quotes used to preserve exact case when needed
+- Statement 4 (SelectAuthorsByHireYear) uses quoted lowercase column names
+
+DMS TOOL SCHEMA TRANSFORMATIONS
+---------------------------------
+DMS Tool Status: All conversions failed due to metadata model errors
+Manual Conversion Applied: Yes
+Schema Names Respected: Yes - All manual conversions used the bobsbookstore_dbo 
+                         schema prefix consistently
+
+=============================================================================
+TRANSFORMATION SUMMARY
+=============================================================================
+Schema Name Changed: YES (dbo → bobsbookstore_dbo)
+Object Names Changed: YES (PascalCase → lowercase)
+Bracket Notation Removed: YES
+Parameter Syntax Changed: YES (@ prefix → $ prefix with positions)
+Calling Convention Changed: YES (EXEC procedure → SELECT function)
+=============================================================================
