@@ -1,7 +1,11 @@
-﻿using Bookstore.Domain.Customers;
+using System;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Bookstore.Domain.Customers;
 
 namespace Bookstore.Domain.Addresses
 {
+    [Table("address", Schema = "bobsbookstore_dbo")]
     public class Address : Entity
     {
         // An empty constructor is required by EF Core
@@ -21,21 +25,41 @@ namespace Bookstore.Domain.Addresses
             ZipCode = zipCode;
         }
 
+        [Column("id")]
+        public new int Id { get; set; }
+
+        [Column("createdby")]
+        public new string? CreatedBy { get; set; }
+
+        [Column("createdon")]
+        public new DateTime CreatedOn { get; set; }
+
+        [Column("updatedon")]
+        public new DateTime? UpdatedOn { get; set; }
+
+        [Column("addressline1")]
         public string AddressLine1 { get; set; }
 
+        [Column("addressline2")]
         public string? AddressLine2 { get; set; }
 
+        [Column("city")]
         public string City { get; set; }
 
+        [Column("state")]
         public string State { get; set; }
 
+        [Column("country")]
         public string Country { get; set; }
 
+        [Column("zipcode")]
         public string ZipCode { get; set; }
 
+        [Column("customerid")]
         public int CustomerId { get; set; }
         public Customer Customer { get; set; }
 
+        [Column("isactive")]
         public bool IsActive { get; set; } = true;
     }
 }
