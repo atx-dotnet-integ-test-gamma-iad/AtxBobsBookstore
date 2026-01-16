@@ -1,0 +1,101 @@
+{
+  "conversion_summary": {
+    "total_statements": 5,
+    "dms_successful": 0,
+    "dms_failed": 5,
+    "manual_conversion_required": 5,
+    "conversion_timestamp": "2026-01-16T18:50:17Z"
+  },
+  "statements": [
+    {
+      "statement_id": 1,
+      "source_file": "AuthorsController.cs",
+      "method": "EditUsingStoredProcedure",
+      "line_number": 164,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "dms_invoked": true,
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_full_output": {
+        "conversion_timestamp": "2026-01-16T18:50:17.682911",
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "manual_conversion_notes": "PostgreSQL uses functions instead of stored procedures with output parameters. The function should be called directly with SELECT. Schema name preserved as bobsbookstore_dbo. Function name converted to lowercase following PostgreSQL naming conventions."
+    },
+    {
+      "statement_id": 2,
+      "source_file": "AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql",
+      "line_number": 192,
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "dms_invoked": true,
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_full_output": {
+        "conversion_timestamp": "2026-01-16T18:50:55.382568",
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion": "SELECT * FROM bobsbookstore_dbo.author",
+      "manual_conversion_notes": "Simple SELECT statement already compatible with PostgreSQL. Schema name preserved as bobsbookstore_dbo."
+    },
+    {
+      "statement_id": 3,
+      "source_file": "AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql",
+      "line_number": 211,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "dms_invoked": true,
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_full_output": {
+        "conversion_timestamp": "2026-01-16T18:51:31.126925",
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "manual_conversion_notes": "PostgreSQL uses functions instead of stored procedures with output parameters. The function should be called directly with SELECT. Schema name preserved as bobsbookstore_dbo. Function name converted to lowercase following PostgreSQL naming conventions."
+    },
+    {
+      "statement_id": 4,
+      "source_file": "AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear",
+      "line_number": 231,
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "dms_invoked": true,
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_full_output": {
+        "conversion_timestamp": "2026-01-16T18:52:02.556753",
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion": "SELECT \"businessentityid\", TO_CHAR(\"modifieddate\", 'YYYY-MM-DD HH24:MI:SS') AS \"formattedmodifieddate\", EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, \"birthdate\")) AS \"age\" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM \"hiredate\") = @HireDate;",
+      "manual_conversion_notes": "SQL Server functions converted to PostgreSQL equivalents: FORMAT → TO_CHAR (with PostgreSQL format codes YYYY-MM-DD HH24:MI:SS), DATEDIFF(YEAR, ..., GETDATE()) → EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, ...)), DATEPART(YEAR, ...) → EXTRACT(YEAR FROM ...). Column names converted to lowercase with quotes for PostgreSQL case-sensitivity. Schema name preserved as bobsbookstore_dbo."
+    },
+    {
+      "statement_id": 5,
+      "source_file": "ProductsController.cs",
+      "method": "FindAllProducts",
+      "line_number": 32,
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "dms_invoked": true,
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_full_output": {
+        "conversion_timestamp": "2026-01-16T18:52:35.963144",
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "manual_conversion_notes": "PostgreSQL uses functions instead of stored procedures. The function should be called with SELECT * FROM. Schema name preserved as bobsbookstore_dbo. Function name converted to lowercase following PostgreSQL naming conventions."
+    }
+  ]
+}

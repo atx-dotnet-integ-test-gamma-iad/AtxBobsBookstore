@@ -1,0 +1,192 @@
+{
+  "migration_summary": {
+    "migration_date": "2026-01-16",
+    "migration_type": "Microsoft SQL Server to PostgreSQL",
+    "application": "Bob's Bookstore ADO.NET Application",
+    "total_sql_statements_processed": 5,
+    "statements_successfully_converted_by_dms": 0,
+    "statements_requiring_manual_intervention": 5,
+    "statements_validated_as_equivalent": 1,
+    "statements_validated_as_non_equivalent": 0,
+    "statements_with_equivalency_validation_errors": 4
+  },
+  "statement_transformation_journey": [
+    {
+      "statement_id": 1,
+      "source_file": "AuthorsController.cs",
+      "method": "EditUsingStoredProcedure",
+      "line_number": 164,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "extracted": "SUCCESS - Step 1",
+      "dms_conversion_status": "FAILED - Metadata model creation error",
+      "dms_conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "equivalency_validation": "ERROR - Tool returned UNKNOWN (marked as ERROR per definition)",
+      "re_integrated": "SUCCESS - Step 4",
+      "requires_manual_review": true,
+      "manual_review_reason": "Stored procedure conversion - equivalency could not be formally verified"
+    },
+    {
+      "statement_id": 2,
+      "source_file": "AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql",
+      "line_number": 192,
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "extracted": "SUCCESS - Step 1",
+      "dms_conversion_status": "FAILED - Metadata model creation error",
+      "dms_conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "equivalency_validation": "EQUIVALENT - Verified by tool",
+      "re_integrated": "SUCCESS - Step 4",
+      "requires_manual_review": false,
+      "manual_review_reason": null
+    },
+    {
+      "statement_id": 3,
+      "source_file": "AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql",
+      "line_number": 211,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "extracted": "SUCCESS - Step 1",
+      "dms_conversion_status": "FAILED - Metadata model creation error",
+      "dms_conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "equivalency_validation": "ERROR - Tool returned UNKNOWN (marked as ERROR per definition)",
+      "re_integrated": "SUCCESS - Step 4",
+      "requires_manual_review": true,
+      "manual_review_reason": "Stored procedure conversion - equivalency could not be formally verified"
+    },
+    {
+      "statement_id": 4,
+      "source_file": "AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear",
+      "line_number": 231,
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "extracted": "SUCCESS - Step 1",
+      "dms_conversion_status": "FAILED - Metadata model creation error",
+      "dms_conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "converted_statement": "SELECT \"businessentityid\", TO_CHAR(\"modifieddate\", 'YYYY-MM-DD HH24:MI:SS') AS \"formattedmodifieddate\", EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, \"birthdate\")) AS \"age\" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM \"hiredate\") = @HireDate;",
+      "equivalency_validation": "ERROR - Tool returned UNKNOWN (marked as ERROR per definition)",
+      "re_integrated": "SUCCESS - Step 4",
+      "requires_manual_review": true,
+      "manual_review_reason": "Complex function conversions (FORMAT, DATEDIFF, GETDATE, DATEPART) - equivalency could not be formally verified"
+    },
+    {
+      "statement_id": 5,
+      "source_file": "ProductsController.cs",
+      "method": "FindAllProducts",
+      "line_number": 32,
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "extracted": "SUCCESS - Step 1",
+      "dms_conversion_status": "FAILED - Metadata model creation error",
+      "dms_conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "equivalency_validation": "ERROR - Tool returned UNKNOWN (marked as ERROR per definition)",
+      "re_integrated": "SUCCESS - Step 4",
+      "requires_manual_review": true,
+      "manual_review_reason": "Stored procedure conversion - equivalency could not be formally verified"
+    }
+  ],
+  "exit_criteria_validation": {
+    "all_sql_server_packages_replaced": true,
+    "all_sqlparameter_replaced_with_npgsqlparameter": true,
+    "all_sql_statements_processed_through_dms": true,
+    "comprehensive_catalog_exists": true,
+    "all_statement_pairs_validated": true,
+    "equivalency_report_generated": true,
+    "no_agent_judgment_used_for_equivalency": true,
+    "failed_dms_conversions_documented": true,
+    "application_compiles_without_errors": true,
+    "all_database_operations_updated": true
+  },
+  "transformation_artifacts": {
+    "extracted_statements_sql": {
+      "path": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/extracted_statements.sql",
+      "status": "COMPLETE",
+      "statement_count": 5
+    },
+    "converted_statements_sql": {
+      "path": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/converted_statements.sql",
+      "status": "COMPLETE",
+      "statement_count": 5
+    },
+    "dms_conversion_log_json": {
+      "path": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/dms_conversion_log.json",
+      "status": "COMPLETE",
+      "dms_invocations": 5,
+      "dms_successes": 0,
+      "dms_failures": 5
+    },
+    "sql_equivalency_validation_report_json": {
+      "path": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/sql_equivalency_validation_report.json",
+      "status": "COMPLETE",
+      "validations_performed": 5,
+      "equivalent_statements": 1,
+      "non_equivalent_statements": 0,
+      "error_validations": 4
+    },
+    "final_migration_report_json": {
+      "path": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/final_migration_report.json",
+      "status": "COMPLETE"
+    }
+  },
+  "statements_requiring_manual_review": [
+    {
+      "statement_id": 1,
+      "reason": "Stored procedure conversion - equivalency could not be formally verified",
+      "priority": "HIGH",
+      "recommendation": "Test uspupdateauthorpersonalinfo function with actual data to verify behavior matches original stored procedure"
+    },
+    {
+      "statement_id": 3,
+      "reason": "Stored procedure conversion - equivalency could not be formally verified",
+      "priority": "HIGH",
+      "recommendation": "Test uspdeleteauthor function with actual data to verify behavior matches original stored procedure"
+    },
+    {
+      "statement_id": 4,
+      "reason": "Complex function conversions (FORMAT, DATEDIFF, GETDATE, DATEPART) - equivalency could not be formally verified",
+      "priority": "MEDIUM",
+      "recommendation": "Test date formatting and age calculation with sample data to verify PostgreSQL functions produce identical results"
+    },
+    {
+      "statement_id": 5,
+      "reason": "Stored procedure conversion - equivalency could not be formally verified",
+      "priority": "HIGH",
+      "recommendation": "Test uspgetproductdata function with actual data to verify behavior matches original stored procedure"
+    }
+  ],
+  "code_changes_summary": {
+    "files_modified": [
+      "AuthorsController.cs",
+      "ProductsController.cs",
+      "Bookstore.Web.csproj"
+    ],
+    "sql_statements_replaced": 5,
+    "sqlparameter_references_replaced": 7,
+    "packages_removed": [
+      "Microsoft.EntityFrameworkCore.SqlServer Version 8.0.10"
+    ],
+    "packages_retained": [
+      "Npgsql.EntityFrameworkCore.PostgreSQL Version 8.0.0"
+    ]
+  },
+  "build_status": {
+    "final_build_successful": true,
+    "build_time": "00:00:04.73",
+    "warnings": 57,
+    "errors": 0
+  },
+  "migration_notes": [
+    "All 5 SQL statements were processed through DMS MCP tool as required",
+    "DMS tool failed for all statements with metadata model creation error",
+    "Manual PostgreSQL conversions applied following best practices",
+    "All statement pairs validated using SQL Equivalency MCP tool",
+    "No agent judgment used for equivalency determination - all statuses from tool",
+    "1 statement validated as EQUIVALENT, 4 returned UNKNOWN (marked as ERROR per definition)",
+    "All SQL Server specific syntax eliminated from codebase",
+    "Application builds successfully with no compilation errors",
+    "Schema names preserved as bobsbookstore_dbo (no DMS schema transformations)",
+    "Complete audit trail maintained through all transformation artifacts"
+  ]
+}
