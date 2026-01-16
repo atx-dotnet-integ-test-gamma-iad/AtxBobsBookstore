@@ -1,0 +1,93 @@
+{
+  "report_date": "2025-01-16T05:11:00Z",
+  "validation_tool": "sql-equivalency___validate_sql_equivalence",
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 1,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 4,
+  "statement_details": [
+    {
+      "statement_id": "STATEMENT_1",
+      "source_file": "/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 164,
+      "method_name": "EditUsingStoredProcedure",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-16T05:10:04.358126\"}",
+      "notes": "Tool returned UNKNOWN, marked as ERROR per transformation definition. Stored procedure call pattern with return value - formal verification could not prove equivalency."
+    },
+    {
+      "statement_id": "STATEMENT_2",
+      "source_file": "/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 184,
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": "{\"equivalence_status\": \"EQUIVALENT\", \"result_details\": \"StructuralEquivalenceVerifier stage in formal methods proved equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-16T05:10:16.323898\"}",
+      "notes": "Tool returned EQUIVALENT. Simple SELECT statement, already PostgreSQL-compatible, structural equivalence verified."
+    },
+    {
+      "statement_id": "STATEMENT_3",
+      "source_file": "/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 205,
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-16T05:10:29.697676\"}",
+      "notes": "Tool returned UNKNOWN, marked as ERROR per transformation definition. Stored procedure call pattern with return value - formal verification could not prove equivalency."
+    },
+    {
+      "statement_id": "STATEMENT_4",
+      "source_file": "/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 224,
+      "method_name": "SelectAuthorsByHireYear",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(NOW(), BirthDate))::INTEGER AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-16T05:10:44.057229\"}",
+      "notes": "Tool returned UNKNOWN, marked as ERROR per transformation definition. Complex query with multiple function conversions (FORMAT->TO_CHAR, GETDATE->NOW, DATEDIFF->DATE_PART/AGE, DATEPART->EXTRACT) - formal verification could not prove equivalency."
+    },
+    {
+      "statement_id": "STATEMENT_5",
+      "source_file": "/app/Bookstore.Web/Controllers/ProductsController.cs",
+      "line_number": 31,
+      "method_name": "FindAllProducts",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-16T05:11:10.363632\"}",
+      "notes": "Tool returned UNKNOWN, marked as ERROR per transformation definition. Stored procedure call pattern returning table - formal verification could not prove equivalency."
+    }
+  ],
+  "summary": {
+    "validation_completion": "ALL 5 statement pairs validated through SQL Equivalency MCP tool",
+    "no_agent_judgment_used": "Equivalency status determined SOLELY by tool output, not agent judgment",
+    "tool_results_breakdown": {
+      "EQUIVALENT": 1,
+      "UNKNOWN_marked_as_ERROR": 4
+    },
+    "statements_requiring_manual_review": [
+      "STATEMENT_1: Stored procedure call with return value - equivalency could not be formally verified",
+      "STATEMENT_3: Stored procedure call with return value - equivalency could not be formally verified",
+      "STATEMENT_4: Complex query with multiple function conversions - equivalency could not be formally verified",
+      "STATEMENT_5: Stored procedure call returning table - equivalency could not be formally verified"
+    ],
+    "critical_compliance_notes": [
+      "CRITICAL: All 5 statement pairs processed through SQL Equivalency MCP tool - NO EXCEPTIONS",
+      "CRITICAL: Equivalency status came exclusively from tool output - NO AGENT JUDGMENT used",
+      "CRITICAL: UNKNOWN tool results marked as ERROR per transformation definition",
+      "CRITICAL: Each statement validated independently - errors on some statements did not prevent validation of others",
+      "The 4 statements marked ERROR (UNKNOWN from tool) involve stored procedure calls and complex function conversions where formal verification methods could not prove equivalency",
+      "Statement 2 (simple SELECT) successfully validated as EQUIVALENT by structural equivalence verifier",
+      "Manual review recommended for ERROR statements to verify functional correctness through testing"
+    ]
+  }
+}

@@ -1,0 +1,131 @@
+-- ============================================================================
+-- PostgreSQL Converted SQL Statements for Bob's Bookstore Migration
+-- Converted: 2025-01-16
+-- Purpose: PostgreSQL equivalents of all SQL Server statements
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE (DMS tool metadata model creation failed)
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 1: Update Author Personal Info (Stored Procedure Call)
+-- ============================================================================
+-- Original SQL Server Statement:
+-- DECLARE @rowsAffected INT;
+-- EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+-- SELECT @rowsAffected;
+--
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE
+-- DMS Error: Metadata model creation failed: The selected objects were not found
+-- Reasoning: DMS tool could not find stored procedure metadata. Manual conversion based on:
+--   1. PostgreSQL uses DO blocks or functions, not EXEC with return values
+--   2. Schema changed from [dbo]. to bobsbookstore_dbo.
+--   3. PostgreSQL function calls use SELECT syntax
+--   4. Return value handling through function return
+-- Schema Object Name Changes: [dbo].[uspUpdateAuthorPersonalInfo] -> bobsbookstore_dbo.uspupdateauthorpersonalinfo
+-- ============================================================================
+SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+-- ============================================================================
+-- STATEMENT 2: Select All Authors
+-- ============================================================================
+-- Original SQL Server Statement:
+-- SELECT * FROM bobsbookstore_dbo.author;
+--
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE
+-- DMS Error: Metadata model creation failed: The selected objects were not found
+-- Reasoning: Statement is already PostgreSQL-compatible. Schema reference is correct.
+--   No SQL Server-specific syntax present.
+-- Schema Object Name Changes: None (already uses bobsbookstore_dbo.author)
+-- ============================================================================
+SELECT * FROM bobsbookstore_dbo.author;
+
+-- ============================================================================
+-- STATEMENT 3: Delete Author (Stored Procedure Call)
+-- ============================================================================
+-- Original SQL Server Statement:
+-- DECLARE @rowsAffected INT;
+-- EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+-- SELECT @rowsAffected;
+--
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE
+-- DMS Error: Metadata model creation failed: The selected objects were not found
+-- Reasoning: DMS tool could not find stored procedure metadata. Manual conversion based on:
+--   1. PostgreSQL function call syntax using SELECT
+--   2. Schema changed from [dbo]. to bobsbookstore_dbo.
+--   3. Function returns the affected row count directly
+-- Schema Object Name Changes: [dbo].[uspDeleteAuthor] -> bobsbookstore_dbo.uspdeleteauthor
+-- ============================================================================
+SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);
+
+-- ============================================================================
+-- STATEMENT 4: Select Authors by Hire Year with Age Calculation
+-- ============================================================================
+-- Original SQL Server Statement:
+-- SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+--
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE
+-- DMS Error: Metadata model creation failed: The selected objects were not found
+-- Reasoning: Multiple SQL Server-specific functions require PostgreSQL equivalents:
+--   1. FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') -> TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS')
+--   2. GETDATE() -> NOW() or CURRENT_TIMESTAMP
+--   3. DATEDIFF(YEAR, BirthDate, GETDATE()) -> DATE_PART('year', AGE(NOW(), BirthDate))
+--   4. DATEPART(YEAR, HireDate) -> EXTRACT(YEAR FROM HireDate)
+-- Schema Object Name Changes: None (already uses bobsbookstore_dbo.author)
+-- PostgreSQL Function Mappings:
+--   - FORMAT() -> TO_CHAR() with PostgreSQL format codes
+--   - DATEDIFF(YEAR, ...) -> DATE_PART('year', AGE(...))
+--   - GETDATE() -> NOW()
+--   - DATEPART(YEAR, ...) -> EXTRACT(YEAR FROM ...)
+-- ============================================================================
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(NOW(), BirthDate))::INTEGER AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+-- ============================================================================
+-- STATEMENT 5: Get Product Data (Stored Procedure Call)
+-- ============================================================================
+-- Original SQL Server Statement:
+-- EXEC [dbo].[uspGetProductData];
+--
+-- Conversion Method: MANUAL_AFTER_DMS_FAILURE
+-- DMS Error: Metadata model creation failed: The selected objects were not found
+-- Reasoning: DMS tool could not find stored procedure metadata. Manual conversion based on:
+--   1. PostgreSQL function call for stored procedures that return result sets
+--   2. Schema changed from [dbo]. to bobsbookstore_dbo.
+--   3. Use SELECT * FROM to call function that returns table
+-- Schema Object Name Changes: [dbo].[uspGetProductData] -> bobsbookstore_dbo.uspgetproductdata
+-- ============================================================================
+SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
+
+-- ============================================================================
+-- CONVERSION SUMMARY
+-- ============================================================================
+-- Total Statements Converted: 5
+-- 
+-- Conversion Methods:
+--   - DMS_TOOL: 0 (all DMS conversions failed)
+--   - MANUAL_AFTER_DMS_FAILURE: 5 (all statements)
+--
+-- DMS Failure Reason:
+--   All DMS conversions failed with: "Metadata model creation failed: The selected objects were not found"
+--   This indicates the database metadata is not accessible to the DMS migration project.
+--
+-- PostgreSQL Function/Syntax Conversions Applied:
+--   - EXEC [dbo].[procedure] -> SELECT schema.function() or SELECT * FROM schema.function()
+--   - DECLARE @var -> Removed (handled by function return values)
+--   - FORMAT(date, 'format') -> TO_CHAR(date, 'POSTGRESQL_FORMAT')
+--   - GETDATE() -> NOW()
+--   - DATEDIFF(YEAR, date1, date2) -> DATE_PART('year', AGE(date2, date1))
+--   - DATEPART(YEAR, date) -> EXTRACT(YEAR FROM date)
+--   - [dbo]. -> bobsbookstore_dbo.
+--   - Stored procedure names to lowercase (PostgreSQL convention)
+--
+-- Schema Object Name Changes:
+--   1. [dbo].[uspUpdateAuthorPersonalInfo] -> bobsbookstore_dbo.uspupdateauthorpersonalinfo
+--   2. [dbo].[uspDeleteAuthor] -> bobsbookstore_dbo.uspdeleteauthor
+--   3. [dbo].[uspGetProductData] -> bobsbookstore_dbo.uspgetproductdata
+--   4. bobsbookstore_dbo.author -> bobsbookstore_dbo.author (no change)
+--
+-- Notes:
+-- - All stored procedure calls converted to PostgreSQL function call syntax
+-- - All SQL Server date functions converted to PostgreSQL equivalents
+-- - Schema references updated from [dbo]. to bobsbookstore_dbo.
+-- - Stored procedure names lowercased per PostgreSQL identifier conventions
+-- ============================================================================
