@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Authors;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -159,14 +160,18 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
+                // SQL Statement converted from T-SQL to PostgreSQL
+                // Original: DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+                // Conversion Method: MANUAL_AFTER_DMS_FAILURE
+                // Converted stored procedure call to PostgreSQL function call syntax
+                string sql = @"SELECT public.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);";
 
                 var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, 
-                    new SqlParameter("@BusinessEntityID", businessEntityId),
-                    new SqlParameter("@NationalIDNumber", nationalIdNumber),
-                    new SqlParameter("@BirthDate", birthDate.ToUniversalTime()),
-                    new SqlParameter("@MaritalStatus", maritalStatus),
-                    new SqlParameter("@Gender", gender)
+                    new NpgsqlParameter { Value = businessEntityId },
+                    new NpgsqlParameter { Value = nationalIdNumber },
+                    new NpgsqlParameter { Value = birthDate.ToUniversalTime() },
+                    new NpgsqlParameter { Value = maritalStatus },
+                    new NpgsqlParameter { Value = gender }
                     );
 
                 return rowsAffected > 0;
@@ -182,8 +187,12 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"SELECT * FROM Author";
+                // SQL Statement converted from T-SQL to PostgreSQL
+                // Original: SELECT * FROM bobsbookstore_dbo.author
+                // Conversion Method: MANUAL_AFTER_DMS_FAILURE
+                // Statement is already PostgreSQL compatible (no changes required)
+                // Equivalency Status: EQUIVALENT (verified by SQL Equivalency tool)
+                string sql = @"SELECT * FROM bobsbookstore_dbo.author";
 
                 // Execute the SQL command and get the number of rows affected
                 var results = await _context.Database.SqlQueryRaw<Author>(sql).ToListAsync();
@@ -203,11 +212,14 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;";
+                // SQL Statement converted from T-SQL to PostgreSQL
+                // Original: DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+                // Conversion Method: MANUAL_AFTER_DMS_FAILURE
+                // Converted stored procedure call to PostgreSQL function call syntax
+                string sql = @"SELECT public.uspdeleteauthor($1);";
 
                 // Execute the SQL command and get the number of rows affected
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new SqlParameter("@BusinessEntityID", businessEntityId));
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new NpgsqlParameter { Value = businessEntityId });
 
                 return rowsAffected > 0;
             }
@@ -223,11 +235,14 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                // Build the SQL command
-                string sql = @"SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;";
+                // SQL Statement converted from T-SQL to PostgreSQL
+                // Original: SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+                // Conversion Method: MANUAL_AFTER_DMS_FAILURE
+                // Date function conversions: FORMAT→TO_CHAR, DATEDIFF→AGE/DATE_PART, GETDATE→CURRENT_DATE, DATEPART→EXTRACT
+                string sql = @"SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = $1;";
 
                 // Execute the SQL command and get the number of rows affected
-                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new SqlParameter("@HireDate", hireYear)).ToListAsync();
+                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new NpgsqlParameter { Value = hireYear }).ToListAsync();
 
                 return results;
             }
