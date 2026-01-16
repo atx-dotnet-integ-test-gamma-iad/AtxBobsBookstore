@@ -1,0 +1,102 @@
+{
+  "integration_date": "2026-01-16",
+  "total_statements_reintegrated": 5,
+  "files_modified": 2,
+  "integration_details": [
+    {
+      "statement_id": "STMT_001",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "EditUsingStoredProcedure",
+      "line_number": 158,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "integrated_sql": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender) AS rows_affected;",
+      "schema_changes": "Converted [dbo] to bobsbookstore_dbo following DMS schema transformation pattern",
+      "syntax_changes": [
+        "Removed DECLARE @rowsAffected INT statement",
+        "Converted EXEC @variable = stored_proc pattern to SELECT function_name() pattern",
+        "Removed separate SELECT @rowsAffected statement - result captured inline"
+      ],
+      "parameter_bindings_preserved": true,
+      "code_structure_maintained": true,
+      "integration_status": "SUCCESS"
+    },
+    {
+      "statement_id": "STMT_002",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql",
+      "line_number": 176,
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "integrated_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "schema_changes": "No changes - schema name already PostgreSQL compatible",
+      "syntax_changes": [],
+      "parameter_bindings_preserved": true,
+      "code_structure_maintained": true,
+      "integration_status": "SUCCESS (NO_CHANGES_NEEDED)"
+    },
+    {
+      "statement_id": "STMT_003",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql",
+      "line_number": 195,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "integrated_sql": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID) AS rows_affected;",
+      "schema_changes": "Converted [dbo] to bobsbookstore_dbo following DMS schema transformation pattern",
+      "syntax_changes": [
+        "Removed DECLARE @rowsAffected INT statement",
+        "Converted EXEC @variable = stored_proc pattern to SELECT function_name() pattern",
+        "Removed separate SELECT @rowsAffected statement - result captured inline"
+      ],
+      "parameter_bindings_preserved": true,
+      "code_structure_maintained": true,
+      "integration_status": "SUCCESS"
+    },
+    {
+      "statement_id": "STMT_004",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear",
+      "line_number": 214,
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "integrated_sql": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "schema_changes": "No schema changes",
+      "syntax_changes": [
+        "Converted FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') to TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS')",
+        "Converted format string from SQL Server to PostgreSQL format",
+        "Converted DATEDIFF(YEAR, BirthDate, GETDATE()) to EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate))",
+        "Converted GETDATE() to CURRENT_DATE",
+        "Converted DATEPART(YEAR, HireDate) to EXTRACT(YEAR FROM HireDate)"
+      ],
+      "parameter_bindings_preserved": true,
+      "code_structure_maintained": true,
+      "integration_status": "SUCCESS"
+    },
+    {
+      "statement_id": "STMT_005",
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "method": "FindAllProducts",
+      "line_number": 32,
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "integrated_sql": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "schema_changes": "Converted [dbo] to bobsbookstore_dbo following DMS schema transformation pattern",
+      "syntax_changes": [
+        "Converted EXEC stored_procedure to SELECT * FROM function_name()",
+        "Stored procedure converted to function call pattern"
+      ],
+      "parameter_bindings_preserved": true,
+      "code_structure_maintained": true,
+      "integration_status": "SUCCESS"
+    }
+  ],
+  "summary": {
+    "total_replacements": 5,
+    "successful_integrations": 5,
+    "failed_integrations": 0,
+    "files_modified": [
+      "app/Bookstore.Web/Controllers/AuthorsController.cs (4 SQL statements updated)",
+      "app/Bookstore.Web/Controllers/ProductsController.cs (1 SQL statement updated)"
+    ],
+    "dms_schema_naming_respected": true,
+    "parameter_bindings_maintained": true,
+    "code_formatting_preserved": true,
+    "all_statements_successfully_reintegrated": true
+  }
+}
