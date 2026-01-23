@@ -1,0 +1,156 @@
+{
+  "conversion_log_metadata": {
+    "conversion_date": "2025-01-23",
+    "step": "Step 2: Convert All SQL Statements Using DMS MCP Tool",
+    "total_statements": 5,
+    "dms_tool_successful": 0,
+    "dms_tool_failed": 5,
+    "manual_conversions": 5,
+    "tool_used": "dms-mcp____statement_conversion_tool"
+  },
+  "statement_conversions": [
+    {
+      "statement_id": 1,
+      "statement_name": "EditUsingStoredProcedure - Update Author Personal Info",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "EditUsingStoredProcedure",
+      "source_line": 163,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempted": true,
+      "dms_tool_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+        "conversion_timestamp": "2026-01-23T00:02:59.956273"
+      },
+      "converted_sql": "UPDATE bobsbookstore_dbo.author SET nationalidnumber = @NationalIDNumber, birthdate = @BirthDate, maritalstatus = @MaritalStatus, gender = @Gender WHERE businessentityid = @BusinessEntityID;",
+      "manual_conversion_notes": "Stored procedure uspUpdateAuthorPersonalInfo performs an UPDATE on Author table. Converted to direct UPDATE statement. Schema bobsbookstore_dbo preserved. Column names lowercase per PostgreSQL conventions. ExecuteSqlRawAsync returns rows affected directly in EF Core, no need for DECLARE/EXEC pattern.",
+      "postgresql_features_used": [
+        "Direct UPDATE statement",
+        "Lowercase column names"
+      ]
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "FindAllAuthorsEmbeddedSql - Select All Authors",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "FindAllAuthorsEmbeddedSql",
+      "source_line": 187,
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempted": true,
+      "dms_tool_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+        "conversion_timestamp": "2026-01-23T00:03:23.791394"
+      },
+      "converted_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "manual_conversion_notes": "Simple SELECT statement already compatible with PostgreSQL. Schema notation bobsbookstore_dbo is correct. No changes needed to SQL syntax. EF Core handles column name mapping.",
+      "postgresql_features_used": [
+        "Standard SELECT syntax"
+      ]
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql - Delete Author",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "DeleteAuthorEmbeddedSql",
+      "source_line": 208,
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempted": true,
+      "dms_tool_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+        "conversion_timestamp": "2026-01-23T00:03:48.119214"
+      },
+      "converted_sql": "DELETE FROM bobsbookstore_dbo.author WHERE businessentityid = @BusinessEntityID;",
+      "manual_conversion_notes": "Stored procedure uspDeleteAuthor performs a DELETE on Author table by BusinessEntityID. Converted to direct DELETE statement. Schema bobsbookstore_dbo preserved. Column names lowercase per PostgreSQL conventions. ExecuteSqlRawAsync returns rows affected directly in EF Core.",
+      "postgresql_features_used": [
+        "Direct DELETE statement",
+        "Lowercase column names"
+      ]
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear - Authors Hired in Specific Year with Age Calculation",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "SelectAuthorsByHireYear",
+      "source_line": 228,
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempted": true,
+      "dms_tool_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+        "conversion_timestamp": "2026-01-23T00:04:11.553207"
+      },
+      "converted_sql": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "manual_conversion_notes": "Most complex statement requiring multiple function conversions: FORMAT() to TO_CHAR() with PostgreSQL pattern format, DATEDIFF(YEAR) to EXTRACT(YEAR FROM AGE()), GETDATE() to CURRENT_TIMESTAMP, DATEPART(YEAR) to EXTRACT(YEAR FROM). Column names lowercase per PostgreSQL conventions.",
+      "postgresql_features_used": [
+        "TO_CHAR() for date formatting",
+        "AGE() function for date difference",
+        "EXTRACT() for date part extraction",
+        "CURRENT_TIMESTAMP for current date/time",
+        "Lowercase column names"
+      ],
+      "sql_server_to_postgresql_mappings": {
+        "FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss')": "TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS')",
+        "DATEDIFF(YEAR, BirthDate, GETDATE())": "EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate))",
+        "GETDATE()": "CURRENT_TIMESTAMP",
+        "DATEPART(YEAR, HireDate)": "EXTRACT(YEAR FROM hiredate)"
+      }
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "FindAllProducts - Get All Products via Stored Procedure",
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "source_method": "FindAllProducts",
+      "source_line": 34,
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_attempted": true,
+      "dms_tool_output": {
+        "status": "error",
+        "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+        "conversion_timestamp": "2026-01-23T00:04:34.585983"
+      },
+      "converted_sql": "SELECT productid, name, productnumber, safetystocklevel FROM bobsbookstore_dbo.product;",
+      "manual_conversion_notes": "Stored procedure uspGetProductData returns a cursor with ProductID, Name, ProductNumber, SafetyStockLevel. Converted to direct SELECT statement with explicit column list. Schema bobsbookstore_dbo preserved. Column names lowercase per PostgreSQL conventions.",
+      "postgresql_features_used": [
+        "Direct SELECT statement",
+        "Lowercase column names",
+        "Explicit column list"
+      ]
+    }
+  ],
+  "conversion_summary": {
+    "sql_server_features_converted": {
+      "stored_procedures": {
+        "count": 3,
+        "procedures": [
+          "uspUpdateAuthorPersonalInfo",
+          "uspDeleteAuthor",
+          "uspGetProductData"
+        ],
+        "conversion_approach": "Replaced with direct SQL statements (UPDATE, DELETE, SELECT)"
+      },
+      "date_functions": {
+        "FORMAT": "Converted to TO_CHAR with PostgreSQL format patterns",
+        "DATEDIFF": "Converted to EXTRACT(YEAR FROM AGE())",
+        "GETDATE": "Converted to CURRENT_TIMESTAMP",
+        "DATEPART": "Converted to EXTRACT()"
+      },
+      "syntax_patterns": {
+        "DECLARE_EXEC_SELECT": "Removed - EF Core ExecuteSqlRawAsync returns rows affected directly"
+      }
+    },
+    "schema_transformations": {
+      "dbo": "bobsbookstore_dbo (preserved as already used in codebase)",
+      "column_naming": "Lowercase per PostgreSQL conventions and EF Core mappings"
+    },
+    "parameter_compatibility": {
+      "syntax": "@parameter syntax preserved - compatible with NpgsqlParameter"
+    }
+  }
+}

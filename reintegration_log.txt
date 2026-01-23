@@ -1,0 +1,185 @@
+===========================================
+SQL STATEMENT RE-INTEGRATION LOG
+===========================================
+Date: 2025-01-23
+Step: Step 4 - Re-integrate Converted SQL Statements into Code
+Purpose: Replace all original SQL Server statements with converted PostgreSQL equivalents
+===========================================
+
+===========================================
+STATEMENT 1: EditUsingStoredProcedure - Update Author Personal Info
+===========================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: EditUsingStoredProcedure
+Line: ~163
+
+ORIGINAL SQL (SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+CONVERTED SQL (PostgreSQL):
+UPDATE bobsbookstore_dbo.author SET nationalidnumber = @NationalIDNumber, birthdate = @BirthDate, maritalstatus = @MaritalStatus, gender = @Gender WHERE businessentityid = @BusinessEntityID;
+
+Changes Applied:
+- Replaced stored procedure call with direct UPDATE statement
+- Removed DECLARE @rowsAffected INT pattern
+- Removed EXEC pattern
+- Removed SELECT @rowsAffected pattern
+- Schema: bobsbookstore_dbo preserved (already in use)
+- Column names: lowercase per PostgreSQL conventions
+- Parameters: @param syntax preserved (5 parameters)
+- EF Core ExecuteSqlRawAsync returns rows affected directly
+
+Status: SUCCESSFULLY RE-INTEGRATED ✓
+
+===========================================
+STATEMENT 2: FindAllAuthorsEmbeddedSql - Select All Authors
+===========================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: FindAllAuthorsEmbeddedSql
+Line: ~187
+
+ORIGINAL SQL (SQL Server):
+SELECT * FROM bobsbookstore_dbo.author
+
+CONVERTED SQL (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Changes Applied:
+- No changes needed - statement already PostgreSQL compatible
+- Schema: bobsbookstore_dbo preserved
+- Statement identical in both databases
+
+Status: NO CHANGES NEEDED (Already Compatible) ✓
+
+===========================================
+STATEMENT 3: DeleteAuthorEmbeddedSql - Delete Author
+===========================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: DeleteAuthorEmbeddedSql
+Line: ~208
+
+ORIGINAL SQL (SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+CONVERTED SQL (PostgreSQL):
+DELETE FROM bobsbookstore_dbo.author WHERE businessentityid = @BusinessEntityID;
+
+Changes Applied:
+- Replaced stored procedure call with direct DELETE statement
+- Removed DECLARE @rowsAffected INT pattern
+- Removed EXEC pattern
+- Removed SELECT @rowsAffected pattern
+- Schema: bobsbookstore_dbo preserved
+- Column names: lowercase per PostgreSQL conventions
+- Parameters: @param syntax preserved (1 parameter)
+- EF Core ExecuteSqlRawAsync returns rows affected directly
+
+Status: SUCCESSFULLY RE-INTEGRATED ✓
+
+===========================================
+STATEMENT 4: SelectAuthorsByHireYear - Authors by Hire Year with Age
+===========================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: SelectAuthorsByHireYear
+Line: ~228
+
+ORIGINAL SQL (SQL Server):
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+CONVERTED SQL (PostgreSQL):
+SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;
+
+Changes Applied:
+- FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') → TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS')
+- DATEDIFF(YEAR, BirthDate, GETDATE()) → EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, birthdate))
+- DATEPART(YEAR, HireDate) → EXTRACT(YEAR FROM hiredate)
+- GETDATE() → CURRENT_TIMESTAMP
+- Column names: lowercase per PostgreSQL conventions (businessentityid, modifieddate, birthdate, hiredate)
+- Alias names: lowercase (formattedmodifieddate, age)
+- Schema: bobsbookstore_dbo preserved
+- Parameters: @param syntax preserved (1 parameter)
+
+SQL Server to PostgreSQL Function Mappings:
+- FORMAT → TO_CHAR (date formatting)
+- DATEDIFF → EXTRACT with AGE (date difference)
+- GETDATE → CURRENT_TIMESTAMP (current date/time)
+- DATEPART → EXTRACT (date part extraction)
+
+Status: SUCCESSFULLY RE-INTEGRATED ✓
+
+===========================================
+STATEMENT 5: FindAllProducts - Get All Products
+===========================================
+File: app/Bookstore.Web/Controllers/ProductsController.cs
+Method: FindAllProducts
+Line: ~34
+
+ORIGINAL SQL (SQL Server):
+EXEC [dbo].[uspGetProductData];
+
+CONVERTED SQL (PostgreSQL):
+SELECT productid, name, productnumber, safetystocklevel FROM bobsbookstore_dbo.product;
+
+Changes Applied:
+- Replaced stored procedure call with direct SELECT statement
+- Removed EXEC [dbo].[uspGetProductData] pattern
+- Added explicit column list: productid, name, productnumber, safetystocklevel
+- Schema: bobsbookstore_dbo preserved
+- Column names: lowercase per PostgreSQL conventions
+- No parameters needed
+
+Status: SUCCESSFULLY RE-INTEGRATED ✓
+
+===========================================
+RE-INTEGRATION SUMMARY
+===========================================
+Total SQL Statements Re-integrated: 5
+Files Modified: 2
+- app/Bookstore.Web/Controllers/AuthorsController.cs (4 statements)
+- app/Bookstore.Web/Controllers/ProductsController.cs (1 statement)
+
+By Type:
+- Stored Procedure → UPDATE: 1 statement
+- Stored Procedure → DELETE: 1 statement
+- Stored Procedure → SELECT: 1 statement
+- Simple SELECT (no changes): 1 statement
+- Complex SELECT (date functions): 1 statement
+
+SQL Server Features Removed:
+- DECLARE @rowsAffected INT pattern (3 instances)
+- EXEC stored procedure calls (3 instances)
+- SELECT @rowsAffected pattern (2 instances)
+- FORMAT() function (1 instance)
+- DATEDIFF() function (1 instance)
+- GETDATE() function (1 instance)
+- DATEPART() function (1 instance)
+
+PostgreSQL Features Added:
+- Direct UPDATE statement (1 instance)
+- Direct DELETE statement (1 instance)
+- Direct SELECT with explicit columns (1 instance)
+- TO_CHAR() for date formatting (1 instance)
+- EXTRACT() with AGE() for date difference (1 instance)
+- CURRENT_TIMESTAMP for current date/time (1 instance)
+- EXTRACT() for date part (1 instance)
+
+Schema Transformations:
+- Schema name: bobsbookstore_dbo preserved throughout (already in use)
+- Column names: Converted to lowercase per PostgreSQL conventions
+- Parameter syntax: @param preserved (compatible with NpgsqlParameter)
+
+Code Logic Preserved:
+✓ All method signatures unchanged
+✓ All parameter bindings preserved
+✓ All return types unchanged
+✓ All error handling unchanged
+✓ All async/await patterns unchanged
+✓ All EF Core API calls unchanged (ExecuteSqlRawAsync, SqlQueryRaw)
+
+Verification:
+✓ No MS SQL syntax remains (GETDATE, DATEDIFF, FORMAT, DATEPART, EXEC with SQL Server patterns)
+✓ Schema names match DMS conversions (bobsbookstore_dbo preserved)
+✓ All SQL statements in code match converted PostgreSQL statements from Step 2
+✓ All 5 statements successfully re-integrated
+
+===========================================
