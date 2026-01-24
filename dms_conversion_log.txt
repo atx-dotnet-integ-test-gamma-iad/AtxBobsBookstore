@@ -1,0 +1,193 @@
+================================================================================
+DMS CONVERSION LOG
+BobsBookstore .NET Application - SQL Server to PostgreSQL Migration
+Date: 2026-01-24
+================================================================================
+
+SUMMARY:
+- Total Statements Processed: 5
+- DMS Tool Successes: 0
+- DMS Tool Failures: 5
+- Manual Conversions Applied: 5
+
+================================================================================
+STATEMENT 1 - uspUpdateAuthorPersonalInfo
+================================================================================
+Timestamp: 2026-01-24T19:50:41.800034
+Source: AuthorsController.cs, Line 157, Method: EditUsingStoredProcedure
+
+DMS Tool Input:
+Schema: dbo
+SQL: DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+DMS Tool Status: ERROR
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-24T19:50:41.800034",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+  "error_timestamp": "2026-01-24T19:50:57.007806"
+}
+
+Manual Conversion Applied: YES
+Manual Conversion Rationale:
+- DMS tool unable to locate metadata for stored procedure
+- PostgreSQL conversion: Changed from SQL Server EXEC syntax to PostgreSQL function call
+- DECLARE/EXEC/SELECT pattern converted to direct SELECT function_name(params)
+- Schema updated to bobsbookstore_dbo to match existing schema naming convention
+
+Manual PostgreSQL Conversion:
+SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+================================================================================
+STATEMENT 2 - SELECT from author table
+================================================================================
+Timestamp: 2026-01-24T19:51:05.468285
+Source: AuthorsController.cs, Line 176, Method: FindAllAuthorsEmbeddedSql
+
+DMS Tool Input:
+Schema: bobsbookstore_dbo
+SQL: SELECT * FROM bobsbookstore_dbo.author;
+
+DMS Tool Status: ERROR
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-24T19:51:05.468285",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+  "error_timestamp": "2026-01-24T19:51:20.473722"
+}
+
+Manual Conversion Applied: YES
+Manual Conversion Rationale:
+- DMS tool unable to locate table metadata
+- Simple SELECT statement is fully compatible with PostgreSQL
+- No syntax changes required - schema and table name remain unchanged
+
+Manual PostgreSQL Conversion:
+SELECT * FROM bobsbookstore_dbo.author;
+
+================================================================================
+STATEMENT 3 - uspDeleteAuthor
+================================================================================
+Timestamp: 2026-01-24T19:51:28.767781
+Source: AuthorsController.cs, Line 195, Method: DeleteAuthorEmbeddedSql
+
+DMS Tool Input:
+Schema: dbo
+SQL: DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+DMS Tool Status: ERROR
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-24T19:51:28.767781",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+  "error_timestamp": "2026-01-24T19:51:43.644200"
+}
+
+Manual Conversion Applied: YES
+Manual Conversion Rationale:
+- DMS tool unable to locate metadata for stored procedure
+- PostgreSQL conversion: Changed from SQL Server EXEC syntax to PostgreSQL function call
+- DECLARE/EXEC/SELECT pattern converted to direct SELECT function_name(params)
+- Schema updated to bobsbookstore_dbo to match existing schema naming convention
+
+Manual PostgreSQL Conversion:
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);
+
+================================================================================
+STATEMENT 4 - Complex SELECT with SQL Server functions
+================================================================================
+Timestamp: 2026-01-24T19:51:51.716806
+Source: AuthorsController.cs, Line 214, Method: SelectAuthorsByHireYear
+
+DMS Tool Input:
+Schema: bobsbookstore_dbo
+SQL: SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Status: ERROR
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-24T19:51:51.716806",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+  "error_timestamp": "2026-01-24T19:52:06.906140"
+}
+
+Manual Conversion Applied: YES
+Manual Conversion Rationale:
+- DMS tool unable to locate table metadata
+- Statement requires conversion of multiple SQL Server specific functions:
+  * FORMAT() → TO_CHAR() with PostgreSQL format patterns
+  * DATEDIFF(YEAR, ..., GETDATE()) → EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, ...))
+  * GETDATE() → CURRENT_TIMESTAMP
+  * DATEPART(YEAR, ...) → EXTRACT(YEAR FROM ...)
+- Schema and table name preserved as bobsbookstore_dbo.author
+
+Manual PostgreSQL Conversion:
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+================================================================================
+STATEMENT 5 - uspGetProductData
+================================================================================
+Timestamp: 2026-01-24T19:52:14.435328
+Source: ProductsController.cs, Line 31, Method: FindAllProducts
+
+DMS Tool Input:
+Schema: dbo
+SQL: EXEC [dbo].[uspGetProductData];
+
+DMS Tool Status: ERROR
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-01-24T19:52:14.435328",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+  "error_timestamp": "2026-01-24T19:52:29.761667"
+}
+
+Manual Conversion Applied: YES
+Manual Conversion Rationale:
+- DMS tool unable to locate metadata for stored procedure
+- PostgreSQL conversion: Changed from SQL Server EXEC syntax to PostgreSQL function call
+- EXEC [dbo].[procedureName] converted to SELECT * FROM schema.procedureName()
+- Schema updated to bobsbookstore_dbo to match existing schema naming convention
+
+Manual PostgreSQL Conversion:
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+================================================================================
+ANALYSIS AND RECOMMENDATIONS
+================================================================================
+
+Root Cause of DMS Failures:
+All 5 statements failed during the DMS metadata model creation phase with the error:
+"The selected objects were not found."
+
+This indicates that the DMS migration project does not have access to the required
+database metadata (tables, stored procedures) needed for conversion.
+
+Impact:
+- All conversions had to be performed manually
+- Manual conversions follow PostgreSQL best practices
+- All SQL Server specific syntax has been converted to PostgreSQL equivalents
+
+Manual Conversion Quality Assurance:
+1. Stored procedures: Converted from EXEC to SELECT function_name() syntax
+2. Date/time functions: Converted to PostgreSQL equivalents (TO_CHAR, EXTRACT, AGE, CURRENT_TIMESTAMP)
+3. Schema naming: Preserved bobsbookstore_dbo schema naming convention
+4. Parameter syntax: Maintained @ parameter notation for consistency with application code
+
+Next Steps:
+1. Validate all converted statements using SQL Equivalency MCP tool
+2. Test converted statements against PostgreSQL database
+3. Update application code with converted SQL statements
+
+================================================================================
+END OF DMS CONVERSION LOG
+================================================================================
