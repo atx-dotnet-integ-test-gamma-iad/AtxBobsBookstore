@@ -1,15 +1,36 @@
-﻿namespace Bookstore.Domain.Carts
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
+
+namespace Bookstore.Domain.Carts
 {
+    [Table("shoppingcart", Schema = "bobsbookstore_dbo")]
     public class ShoppingCart : Entity
     {
         public List<ShoppingCartItem> ShoppingCartItems { get; private set; } = new();
 
+        [Column("correlationid")]
         public string CorrelationId { get; set; }
 
         public ShoppingCart(string correlationId)
         {
             CorrelationId = correlationId;
         }
+
+        // Inherited properties from Entity base class
+        [Column("id")]
+        public new int Id { get; set; }
+
+        [Column("createdby")]
+        public new string CreatedBy { get; set; }
+
+        [Column("createdon")]
+        public new DateTime CreatedOn { get; set; }
+
+        [Column("updatedon")]
+        public new DateTime? UpdatedOn { get; set; }
 
         public IEnumerable<ShoppingCartItem> GetShoppingCartItems(ShoppingCartItemFilter filter)
         {

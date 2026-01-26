@@ -37,7 +37,7 @@ namespace Bookstore.Web.Areas.Admin.Models.Inventory
                     Condition = book.Condition.Text,
                     Genre = book.Genre.Text,
                     Publisher = book.Publisher.Text,
-                    UpdatedOn = book.UpdatedOn,
+                    UpdatedOn = book.UpdatedOn.GetValueOrDefault(),
                     Year = book.Year.GetValueOrDefault(),
                     Price = book.Price,
                     Quantity = book.Quantity
