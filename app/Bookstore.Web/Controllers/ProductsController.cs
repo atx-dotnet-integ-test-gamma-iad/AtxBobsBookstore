@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,7 +31,13 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"EXEC [dbo].[uspGetProductData];";
+                // SQL CONVERSION: Original MS SQL Server EXEC converted to PostgreSQL function call
+                // Conversion Method: MANUAL_AFTER_DMS_FAILURE (DMS tool metadata model creation failed)
+                // Equivalency Status: ERROR (sql-equivalency tool returned UNKNOWN - formal verifier cannot prove stored procedure conversion)
+                // Original: EXEC [dbo].[uspGetProductData];
+                // Converted: SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+                // Note: Stored procedures migrated to PostgreSQL functions called via SELECT * FROM
+                string sql = @"SELECT * FROM bobsbookstore_dbo.uspGetProductData();";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
             }
