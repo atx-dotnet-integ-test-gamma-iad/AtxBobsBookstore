@@ -1,0 +1,83 @@
+{
+  "conversion_log": {
+    "timestamp": "2026-01-30T20:35:00Z",
+    "total_statements": 5,
+    "dms_tool_successful": 0,
+    "dms_tool_failed": 5,
+    "manual_conversions": 5,
+    "statements": [
+      {
+        "statement_id": 1,
+        "source_file": "AuthorsController.cs",
+        "source_line": 163,
+        "original_sql": "DECLARE @rowsAffected INT;\\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\\nSELECT @rowsAffected;",
+        "dms_tool_status": "ERROR",
+        "dms_tool_error": "Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\\\"}",
+        "dms_tool_timestamp": "2026-01-30T20:34:19.085660",
+        "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+        "manual_conversion_notes": "DMS tool failed to find metadata. SQL Server stored procedure call pattern needs conversion to PostgreSQL function. The DECLARE/EXEC/SELECT pattern with output parameter is SQL Server specific. PostgreSQL uses SELECT function() syntax to call functions and get return values.",
+        "converted_sql": "SELECT uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+        "conversion_reasoning": "PostgreSQL uses functions instead of stored procedures. The return value is captured directly from SELECT. Removed [dbo] schema qualification as PostgreSQL will use the search_path. Parameter names remain the same (@param syntax supported by Npgsql)."
+      },
+      {
+        "statement_id": 2,
+        "source_file": "AuthorsController.cs",
+        "source_line": 189,
+        "original_sql": "SELECT * FROM bobsbookstore_dbo.author;",
+        "dms_tool_status": "ERROR",
+        "dms_tool_error": "Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\\\"}",
+        "dms_tool_timestamp": "2026-01-30T20:34:42.104301",
+        "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+        "manual_conversion_notes": "DMS tool failed to find metadata. Simple SELECT statement with schema-qualified table name. Schema name bobsbookstore_dbo likely maps to public or a similar schema in PostgreSQL.",
+        "converted_sql": "SELECT * FROM bobsbookstore_dbo.author;",
+        "conversion_reasoning": "Simple SELECT statement that is PostgreSQL compatible. Kept schema qualification as bobsbookstore_dbo.author since DMS did not provide schema mapping. This should be updated if the actual PostgreSQL schema differs."
+      },
+      {
+        "statement_id": 3,
+        "source_file": "AuthorsController.cs",
+        "source_line": 208,
+        "original_sql": "DECLARE @rowsAffected INT;\\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\\nSELECT @rowsAffected;",
+        "dms_tool_status": "ERROR",
+        "dms_tool_error": "Metadata model creation failed: {'error': \\\"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\\\"}",
+        "dms_tool_timestamp": "2026-01-30T20:35:05.517431",
+        "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+        "manual_conversion_notes": "DMS tool failed to find metadata. Similar to Statement 1, this is a stored procedure call with output parameter that needs conversion to PostgreSQL function.",
+        "converted_sql": "SELECT uspDeleteAuthor(@BusinessEntityID);",
+        "conversion_reasoning": "Converted SQL Server stored procedure EXEC pattern to PostgreSQL function call using SELECT. Removed [dbo] schema qualification. Parameter syntax remains with @ prefix (Npgsql compatible)."
+      },
+      {
+        "statement_id": 4,
+        "source_file": "AuthorsController.cs",
+        "source_line": 228,
+        "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+        "dms_tool_status": "ERROR",
+        "dms_tool_error": "Metadata model creation failed",
+        "dms_tool_timestamp": "2026-01-30T20:35:10Z",
+        "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+        "manual_conversion_notes": "DMS tool failed to find metadata. Complex SELECT with multiple SQL Server-specific date/time functions requiring PostgreSQL equivalents: FORMAT() -> TO_CHAR(), DATEDIFF() -> DATE_PART with AGE(), GETDATE() -> NOW(), DATEPART() -> EXTRACT().",
+        "converted_sql": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(NOW(), BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+        "conversion_reasoning": "Converted SQL Server date functions to PostgreSQL equivalents: FORMAT(date, format) -> TO_CHAR(date, format) with PostgreSQL format codes (YYYY-MM-DD HH24:MI:SS), DATEDIFF(YEAR, start, end) -> DATE_PART('year', AGE(end, start)), GETDATE() -> NOW(), DATEPART(YEAR, date) -> EXTRACT(YEAR FROM date). Schema name kept as bobsbookstore_dbo.author."
+      },
+      {
+        "statement_id": 5,
+        "source_file": "ProductsController.cs",
+        "source_line": 31,
+        "original_sql": "EXEC [dbo].[uspGetProductData];",
+        "dms_tool_status": "ERROR",
+        "dms_tool_error": "Metadata model creation failed",
+        "dms_tool_timestamp": "2026-01-30T20:35:15Z",
+        "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+        "manual_conversion_notes": "DMS tool failed to find metadata. Simple stored procedure call with no parameters needs conversion to PostgreSQL function call.",
+        "converted_sql": "SELECT * FROM uspGetProductData();",
+        "conversion_reasoning": "Converted SQL Server EXEC stored procedure to PostgreSQL function call. Since the procedure returns a result set, used SELECT * FROM function() pattern. Removed [dbo] schema qualification."
+      }
+    ]
+  },
+  "summary": {
+    "dms_tool_availability": "ERROR",
+    "dms_tool_error_pattern": "Metadata model creation failed - selected objects were not found",
+    "impact": "All statements required manual conversion after DMS tool failure",
+    "action_taken": "Applied SQL Server to PostgreSQL conversion rules manually, documented all conversions with reasoning",
+    "validation_required": "All manually converted statements MUST be validated using SQL Equivalency tool in Step 4"
+  }
+}

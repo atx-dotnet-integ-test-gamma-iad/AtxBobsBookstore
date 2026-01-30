@@ -1,0 +1,120 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 1,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 4,
+  "statement_details": [
+    {
+      "statement_id": 1,
+      "source_file": "AuthorsController.cs",
+      "source_line": 163,
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "Cannot validate stored procedure/function calls without function implementation. The SQL Equivalency tool requires concrete SQL statements with table access, not function calls. The original SQL Server stored procedure uspUpdateAuthorPersonalInfo and the converted PostgreSQL function uspUpdateAuthorPersonalInfo cannot be compared without their definitions.",
+      "equivalency_notes": "Stored procedure to function conversion cannot be validated by equivalency tool. Manual validation required: verify PostgreSQL function uspUpdateAuthorPersonalInfo exists and performs same logic as SQL Server stored procedure."
+    },
+    {
+      "statement_id": 2,
+      "source_file": "AuthorsController.cs",
+      "source_line": 189,
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": "{\"equivalence_status\": \"EQUIVALENT\", \"result_details\": \"StructuralEquivalenceVerifier stage in formal methods proved equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-30T20:37:47.131054\"}",
+      "equivalency_notes": "Simple SELECT * statement validated as EQUIVALENT by SQL Equivalency tool using formal verification methods."
+    },
+    {
+      "statement_id": 3,
+      "source_file": "AuthorsController.cs",
+      "source_line": 208,
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT uspDeleteAuthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "Cannot validate stored procedure/function calls without function implementation. The SQL Equivalency tool requires concrete SQL statements with table access, not function calls. The original SQL Server stored procedure uspDeleteAuthor and the converted PostgreSQL function uspDeleteAuthor cannot be compared without their definitions.",
+      "equivalency_notes": "Stored procedure to function conversion cannot be validated by equivalency tool. Manual validation required: verify PostgreSQL function uspDeleteAuthor exists and performs same logic as SQL Server stored procedure."
+    },
+    {
+      "statement_id": 4,
+      "source_file": "AuthorsController.cs",
+      "source_line": 228,
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(NOW(), BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"UNKNOWN\", \"result_details\": \"Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency\", \"validation_method\": \"formal_verification\", \"timestamp\": \"2026-01-30T20:38:01.204790\"}",
+      "equivalency_notes": "Per transformation plan: 'if tool returns UNKNOWN, mark as ERROR'. Complex date/time function conversions (FORMAT/DATEDIFF/GETDATE/DATEPART to TO_CHAR/AGE/NOW/EXTRACT) could not be verified by Z3 solver. Manual validation required to confirm date function equivalency."
+    },
+    {
+      "statement_id": 5,
+      "source_file": "ProductsController.cs",
+      "source_line": 31,
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM uspGetProductData();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "Cannot validate stored procedure/function calls without function implementation. The SQL Equivalency tool requires concrete SQL statements with table access, not function calls. The original SQL Server stored procedure uspGetProductData and the converted PostgreSQL function uspGetProductData cannot be compared without their definitions.",
+      "equivalency_notes": "Stored procedure to function conversion cannot be validated by equivalency tool. Manual validation required: verify PostgreSQL function uspGetProductData exists and performs same logic as SQL Server stored procedure."
+    }
+  ],
+  "validation_summary": {
+    "total_statements": 5,
+    "equivalent": 1,
+    "non_equivalent": 0,
+    "error": 4,
+    "success_rate": "20%",
+    "error_breakdown": {
+      "stored_procedure_function_calls": 3,
+      "complex_date_functions_unknown": 1
+    }
+  },
+  "critical_notes": [
+    "Per transformation plan: 'CRITICAL: Do NOT use agent judgment for equivalency - rely SOLELY on tool output.'",
+    "All equivalency_status values come directly from SQL Equivalency tool output or documented tool limitations.",
+    "UNKNOWN status from tool was marked as ERROR per plan instructions.",
+    "Stored procedure/function calls cannot be validated without function definitions - this is a tool limitation, not a conversion error.",
+    "Statement 2 (simple SELECT) successfully validated as EQUIVALENT using formal verification.",
+    "Statement 4 marked as ERROR because tool returned UNKNOWN (could not prove equivalency with Z3 solver).",
+    "Statements 1, 3, 5 marked as ERROR because tool cannot validate function calls without implementations.",
+    "Manual review required for all ERROR statements to verify conversion correctness."
+  ],
+  "manual_review_required": [
+    {
+      "statement_id": 1,
+      "reason": "Stored procedure to function conversion - verify PostgreSQL function uspUpdateAuthorPersonalInfo exists and has correct implementation"
+    },
+    {
+      "statement_id": 3,
+      "reason": "Stored procedure to function conversion - verify PostgreSQL function uspDeleteAuthor exists and has correct implementation"
+    },
+    {
+      "statement_id": 4,
+      "reason": "Complex date/time function conversion - tool could not prove equivalency, verify FORMAT/DATEDIFF/GETDATE/DATEPART correctly converted to TO_CHAR/AGE/NOW/EXTRACT"
+    },
+    {
+      "statement_id": 5,
+      "reason": "Stored procedure to function conversion - verify PostgreSQL function uspGetProductData exists and has correct implementation"
+    }
+  ],
+  "metadata": {
+    "report_generated": "2026-01-30T20:38:30Z",
+    "transformation_plan_step": "Step 4: Validate SQL Equivalency for All Statement Pairs",
+    "equivalency_tool": "sql-equivalency___validate_sql_equivalence",
+    "validation_method": "formal_verification",
+    "tool_limitations": [
+      "Cannot validate stored procedure/function calls without definitions",
+      "Z3 solver may return UNKNOWN for complex date/time function conversions",
+      "Tool requires concrete SQL statements with table access patterns"
+    ],
+    "compliance": {
+      "all_statements_processed": true,
+      "all_statements_in_report": true,
+      "no_agent_judgment_used": true,
+      "tool_output_only": true,
+      "unknown_marked_as_error": true
+    }
+  }
+}
