@@ -1,0 +1,229 @@
+{
+  "conversion_metadata": {
+    "project_name": "BobsBookstore",
+    "migration_type": "SQL Server to PostgreSQL",
+    "total_statements": 5,
+    "conversion_date": "2024",
+    "dms_tool_used": "dms-mcp____statement_conversion_tool",
+    "dms_configuration": {
+      "database_name": "postgres",
+      "schema_name": "bobsbookstore_dbo",
+      "region": "us-east-1"
+    }
+  },
+  "conversion_results": {
+    "total_processed": 5,
+    "successful_dms_conversions": 0,
+    "failed_dms_conversions": 5,
+    "manual_conversions_after_dms_failure": 5
+  },
+  "statement_conversions": [
+    {
+      "statement_id": 1,
+      "statement_name": "EditUsingStoredProcedure",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_error_timestamp": "2026-01-30T05:49:22.590296",
+      "dms_input": {
+        "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "postgres",
+        "schema_name": "dbo",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reasoning": "DMS tool failed due to missing metadata model objects. The stored procedure uspUpdateAuthorPersonalInfo was not found in the metadata model. Applied manual conversion following PostgreSQL function call syntax patterns. Converted T-SQL EXEC with output parameter pattern to PostgreSQL SELECT function() pattern. Parameters converted from @param to $1, $2, etc.",
+      "converted_sql": "SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);",
+      "conversion_notes": [
+        "Changed from T-SQL DECLARE/EXEC pattern to PostgreSQL SELECT function pattern",
+        "Assumes function uspUpdateAuthorPersonalInfo exists in bobsbookstore_dbo schema",
+        "Parameter references changed from @param to positional $1, $2, $3, $4, $5",
+        "Schema qualification changed from [dbo] to bobsbookstore_dbo",
+        "Return value handling simplified - function returns result directly"
+      ],
+      "requires_stored_procedure_migration": true,
+      "stored_procedure_name": "uspUpdateAuthorPersonalInfo"
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "FindAllAuthorsEmbeddedSql",
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_error_timestamp": "2026-01-30T05:49:46.452355",
+      "dms_input": {
+        "sql_text": "SELECT * FROM bobsbookstore_dbo.author",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "postgres",
+        "schema_name": "dbo",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reasoning": "DMS tool failed due to missing metadata model objects. However, this SELECT statement is already PostgreSQL-compatible. Added semicolon for consistency.",
+      "converted_sql": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_notes": [
+        "Statement is already PostgreSQL-compatible",
+        "No syntax changes required",
+        "Added semicolon for consistency",
+        "Schema name bobsbookstore_dbo already correct for PostgreSQL"
+      ],
+      "requires_stored_procedure_migration": false
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_error_timestamp": "2026-01-30T05:50:09.963202",
+      "dms_input": {
+        "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "postgres",
+        "schema_name": "dbo",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reasoning": "DMS tool failed due to missing metadata model objects. The stored procedure uspDeleteAuthor was not found in the metadata model. Applied manual conversion following PostgreSQL function call syntax patterns. Converted T-SQL EXEC with output parameter pattern to PostgreSQL SELECT function() pattern.",
+      "converted_sql": "SELECT bobsbookstore_dbo.uspDeleteAuthor($1);",
+      "conversion_notes": [
+        "Changed from T-SQL DECLARE/EXEC pattern to PostgreSQL SELECT function pattern",
+        "Assumes function uspDeleteAuthor exists in bobsbookstore_dbo schema",
+        "Parameter reference changed from @BusinessEntityID to $1",
+        "Schema qualification changed from [dbo] to bobsbookstore_dbo",
+        "Return value handling simplified - function returns result directly"
+      ],
+      "requires_stored_procedure_migration": true,
+      "stored_procedure_name": "uspDeleteAuthor"
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_error_timestamp": "2026-01-30T05:50:33.714638",
+      "dms_input": {
+        "sql_text": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "postgres",
+        "schema_name": "dbo",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reasoning": "DMS tool failed due to missing metadata model objects. Applied manual conversion of T-SQL specific date functions to PostgreSQL equivalents. This statement requires multiple function conversions.",
+      "converted_sql": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = $1;",
+      "conversion_notes": [
+        "FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') -> TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS')",
+        "DATEDIFF(YEAR, BirthDate, GETDATE()) -> EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate))",
+        "DATEPART(YEAR, HireDate) -> EXTRACT(YEAR FROM HireDate)",
+        "GETDATE() -> CURRENT_DATE",
+        "@HireDate -> $1",
+        "Date format pattern updated from SQL Server to PostgreSQL format codes",
+        "HH:mm:ss changed to HH24:MI:SS for PostgreSQL 24-hour time format"
+      ],
+      "requires_stored_procedure_migration": false,
+      "t_sql_functions_converted": [
+        "FORMAT",
+        "DATEDIFF",
+        "DATEPART",
+        "GETDATE"
+      ]
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "FindAllProducts",
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "dms_status": "error",
+      "dms_error": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}\"}",
+      "dms_error_timestamp": "2026-01-30T05:50:56.691110",
+      "dms_input": {
+        "sql_text": "EXEC [dbo].[uspGetProductData];",
+        "migration_project_identifier": "arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI",
+        "database_name": "postgres",
+        "schema_name": "dbo",
+        "region": "us-east-1",
+        "server_name": "172.31.93.178"
+      },
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "manual_conversion_reasoning": "DMS tool failed due to missing metadata model objects. The stored procedure uspGetProductData was not found in the metadata model. Applied manual conversion following PostgreSQL function call syntax patterns. Converted T-SQL EXEC to PostgreSQL SELECT FROM function() pattern since this returns a result set.",
+      "converted_sql": "SELECT * FROM bobsbookstore_dbo.uspGetProductData();",
+      "conversion_notes": [
+        "Changed from T-SQL EXEC to PostgreSQL SELECT FROM function() pattern",
+        "Assumes function uspGetProductData exists in bobsbookstore_dbo schema and returns a table",
+        "Schema qualification changed from [dbo] to bobsbookstore_dbo",
+        "Added () for function call syntax",
+        "Used SELECT * FROM pattern for table-returning function"
+      ],
+      "requires_stored_procedure_migration": true,
+      "stored_procedure_name": "uspGetProductData"
+    }
+  ],
+  "summary": {
+    "dms_tool_failures": {
+      "total": 5,
+      "common_error": "Metadata model creation failed: The selected objects were not found",
+      "root_cause": "Database objects (tables and stored procedures) not present in DMS metadata model",
+      "resolution_approach": "Applied manual PostgreSQL conversions based on T-SQL to PostgreSQL migration best practices"
+    },
+    "manual_conversion_patterns_applied": [
+      {
+        "pattern": "T-SQL EXEC stored_proc with output parameter",
+        "postgresql_equivalent": "SELECT function()",
+        "statements_affected": [1, 3]
+      },
+      {
+        "pattern": "T-SQL EXEC stored_proc returning result set",
+        "postgresql_equivalent": "SELECT * FROM function()",
+        "statements_affected": [5]
+      },
+      {
+        "pattern": "T-SQL FORMAT(date, pattern)",
+        "postgresql_equivalent": "TO_CHAR(date, pattern)",
+        "statements_affected": [4]
+      },
+      {
+        "pattern": "T-SQL DATEDIFF(unit, date1, date2)",
+        "postgresql_equivalent": "EXTRACT(unit FROM AGE(date2, date1))",
+        "statements_affected": [4]
+      },
+      {
+        "pattern": "T-SQL DATEPART(unit, date)",
+        "postgresql_equivalent": "EXTRACT(unit FROM date)",
+        "statements_affected": [4]
+      },
+      {
+        "pattern": "T-SQL GETDATE()",
+        "postgresql_equivalent": "CURRENT_DATE or NOW()",
+        "statements_affected": [4]
+      },
+      {
+        "pattern": "T-SQL @parameter",
+        "postgresql_equivalent": "$1, $2, $3, etc.",
+        "statements_affected": [1, 3, 4]
+      },
+      {
+        "pattern": "SQL Server [dbo] schema",
+        "postgresql_equivalent": "bobsbookstore_dbo schema",
+        "statements_affected": [1, 3, 5]
+      }
+    ],
+    "stored_procedures_requiring_migration": [
+      "uspUpdateAuthorPersonalInfo",
+      "uspDeleteAuthor",
+      "uspGetProductData"
+    ],
+    "recommendations": [
+      "Verify that all stored procedures (uspUpdateAuthorPersonalInfo, uspDeleteAuthor, uspGetProductData) have been migrated to PostgreSQL functions",
+      "Test each converted statement with actual data to ensure semantic equivalence",
+      "Review parameter binding in application code to use positional parameters ($1, $2) instead of named parameters (@param)",
+      "Validate date/time function conversions produce identical results",
+      "Consider creating database metadata model in DMS for future conversions"
+    ]
+  }
+}

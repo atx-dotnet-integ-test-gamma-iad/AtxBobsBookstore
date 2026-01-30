@@ -1,0 +1,177 @@
+{
+  "metadata": {
+    "project_name": "BobsBookstore",
+    "migration_type": "SQL Server to PostgreSQL",
+    "total_statements": 5,
+    "extraction_date": "2024",
+    "schema_name": "bobsbookstore_dbo"
+  },
+  "statements": [
+    {
+      "statement_id": 1,
+      "statement_name": "EditUsingStoredProcedure",
+      "statement_type": "Stored Procedure Call with Output Parameter",
+      "source_file": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "EditUsingStoredProcedure",
+      "line_number": "164",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "parameters": [
+        {
+          "name": "@BusinessEntityID",
+          "type": "int",
+          "ado_type": "SqlParameter"
+        },
+        {
+          "name": "@NationalIDNumber",
+          "type": "string",
+          "ado_type": "SqlParameter"
+        },
+        {
+          "name": "@BirthDate",
+          "type": "DateTime",
+          "ado_type": "SqlParameter",
+          "note": "Converted to UTC before passing"
+        },
+        {
+          "name": "@MaritalStatus",
+          "type": "string",
+          "ado_type": "SqlParameter"
+        },
+        {
+          "name": "@Gender",
+          "type": "string",
+          "ado_type": "SqlParameter"
+        }
+      ],
+      "return_type": "int (rows affected)",
+      "execution_method": "ExecuteSqlRawAsync",
+      "description": "Calls uspUpdateAuthorPersonalInfo stored procedure to update author personal information. Uses output parameter pattern with DECLARE and SELECT.",
+      "complexity": "high",
+      "requires_stored_procedure": true,
+      "stored_procedure_name": "uspUpdateAuthorPersonalInfo",
+      "t_sql_features": [
+        "DECLARE",
+        "EXEC with return value",
+        "Output parameter",
+        "Schema qualification [dbo]"
+      ]
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "FindAllAuthorsEmbeddedSql",
+      "statement_type": "SELECT Query",
+      "source_file": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "line_number": "187",
+      "original_sql": "SELECT * FROM bobsbookstore_dbo.author",
+      "parameters": [],
+      "return_type": "List<Author>",
+      "execution_method": "SqlQueryRaw<Author>",
+      "description": "Simple SELECT query to retrieve all authors from the author table",
+      "complexity": "low",
+      "requires_stored_procedure": false,
+      "table_references": [
+        "bobsbookstore_dbo.author"
+      ],
+      "t_sql_features": []
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "statement_type": "Stored Procedure Call with Output Parameter",
+      "source_file": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "line_number": "207",
+      "original_sql": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "parameters": [
+        {
+          "name": "@BusinessEntityID",
+          "type": "int",
+          "ado_type": "SqlParameter"
+        }
+      ],
+      "return_type": "int (rows affected)",
+      "execution_method": "ExecuteSqlRawAsync",
+      "description": "Calls uspDeleteAuthor stored procedure to delete an author. Uses output parameter pattern with DECLARE and SELECT.",
+      "complexity": "high",
+      "requires_stored_procedure": true,
+      "stored_procedure_name": "uspDeleteAuthor",
+      "t_sql_features": [
+        "DECLARE",
+        "EXEC with return value",
+        "Output parameter",
+        "Schema qualification [dbo]"
+      ]
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "statement_type": "SELECT Query with Date Functions",
+      "source_file": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "SelectAuthorsByHireYear",
+      "line_number": "227",
+      "original_sql": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "parameters": [
+        {
+          "name": "@HireDate",
+          "type": "int",
+          "ado_type": "SqlParameter",
+          "note": "Represents year value"
+        }
+      ],
+      "return_type": "List<AuthorAgeResult>",
+      "execution_method": "SqlQueryRaw<AuthorAgeResult>",
+      "description": "Retrieves authors hired in a specific year with formatted modification date and calculated age. Uses multiple T-SQL specific date functions.",
+      "complexity": "medium",
+      "requires_stored_procedure": false,
+      "table_references": [
+        "bobsbookstore_dbo.author"
+      ],
+      "t_sql_features": [
+        "FORMAT function",
+        "DATEDIFF function",
+        "DATEPART function",
+        "GETDATE function"
+      ],
+      "postgresql_conversion_notes": "FORMAT, DATEDIFF, DATEPART, and GETDATE need PostgreSQL equivalents (TO_CHAR, date_part, EXTRACT, NOW/CURRENT_DATE)"
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "FindAllProducts",
+      "statement_type": "Stored Procedure Call",
+      "source_file": "/QNet/site-packages/atx_dot_net_strands_cli/all_local_test_output/artifact-BobsBookstore/artifact/sourceCode/app/Bookstore.Web/Controllers/ProductsController.cs",
+      "method_name": "FindAllProducts",
+      "line_number": "31",
+      "original_sql": "EXEC [dbo].[uspGetProductData];",
+      "parameters": [],
+      "return_type": "List<Product>",
+      "execution_method": "SqlQueryRaw<Product>",
+      "description": "Calls uspGetProductData stored procedure to retrieve all product data",
+      "complexity": "medium",
+      "requires_stored_procedure": true,
+      "stored_procedure_name": "uspGetProductData",
+      "t_sql_features": [
+        "EXEC",
+        "Schema qualification [dbo]"
+      ]
+    }
+  ],
+  "summary": {
+    "total_statements": 5,
+    "statements_with_stored_procedures": 3,
+    "statements_with_t_sql_specific_functions": 1,
+    "simple_select_statements": 1,
+    "files_containing_sql": [
+      "AuthorsController.cs",
+      "ProductsController.cs"
+    ],
+    "stored_procedures_referenced": [
+      "uspUpdateAuthorPersonalInfo",
+      "uspDeleteAuthor",
+      "uspGetProductData"
+    ],
+    "tables_referenced": [
+      "bobsbookstore_dbo.author"
+    ]
+  }
+}

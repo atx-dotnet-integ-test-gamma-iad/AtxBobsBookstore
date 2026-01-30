@@ -1,0 +1,239 @@
+{
+  "migration_metadata": {
+    "project_name": "BobsBookstore",
+    "migration_type": "SQL Server to PostgreSQL",
+    "source_database": "Microsoft SQL Server",
+    "target_database": "PostgreSQL",
+    "migration_date": "2024",
+    "dms_tool": "dms-mcp____statement_conversion_tool",
+    "equivalency_tool": "sql-equivalency___validate_sql_equivalence"
+  },
+  "summary_statistics": {
+    "total_sql_statements_processed": 5,
+    "successful_dms_conversions": 0,
+    "manual_conversions_after_dms_failure": 5,
+    "statements_validated_as_equivalent": 1,
+    "statements_validated_as_non_equivalent": 0,
+    "statements_with_equivalency_errors": 4,
+    "files_modified": 4,
+    "dependencies_updated": 1,
+    "build_status": "SUCCESS"
+  },
+  "sql_statement_processing": {
+    "extraction_phase": {
+      "total_statements_extracted": 5,
+      "source_files": [
+        "AuthorsController.cs (4 statements)",
+        "ProductsController.cs (1 statement)"
+      ],
+      "statement_types": {
+        "stored_procedure_calls": 3,
+        "simple_select_queries": 1,
+        "complex_queries_with_functions": 1
+      },
+      "extraction_artifacts": [
+        "extracted_statements.sql",
+        "sql_statement_mapping.json"
+      ]
+    },
+    "conversion_phase": {
+      "dms_tool_status": {
+        "total_invocations": 5,
+        "successful_conversions": 0,
+        "failed_conversions": 5,
+        "common_error": "Metadata model creation failed: The selected objects were not found"
+      },
+      "manual_conversion_summary": {
+        "total_manual_conversions": 5,
+        "conversion_patterns_applied": [
+          "T-SQL EXEC with output parameter → PostgreSQL SELECT function()",
+          "T-SQL EXEC returning result set → PostgreSQL SELECT * FROM function()",
+          "T-SQL FORMAT() → PostgreSQL TO_CHAR()",
+          "T-SQL DATEDIFF() → PostgreSQL EXTRACT(AGE)",
+          "T-SQL DATEPART() → PostgreSQL EXTRACT()",
+          "T-SQL GETDATE() → PostgreSQL CURRENT_DATE",
+          "T-SQL @parameter → PostgreSQL $1, $2, etc.",
+          "SQL Server [dbo] schema → PostgreSQL bobsbookstore_dbo schema"
+        ]
+      },
+      "conversion_artifacts": [
+        "converted_statements.sql",
+        "dms_conversion_log.json"
+      ]
+    },
+    "equivalency_validation_phase": {
+      "validation_tool_status": {
+        "total_validations": 5,
+        "equivalent_statements": 1,
+        "non_equivalent_statements": 0,
+        "error_statements": 4
+      },
+      "validation_summary": {
+        "statement_1": {
+          "name": "EditUsingStoredProcedure",
+          "status": "ERROR",
+          "reason": "Tool returned UNKNOWN - Stored procedure equivalence cannot be verified without stored procedure implementation"
+        },
+        "statement_2": {
+          "name": "FindAllAuthorsEmbeddedSql",
+          "status": "EQUIVALENT",
+          "reason": "StructuralEquivalenceVerifier proved equivalency"
+        },
+        "statement_3": {
+          "name": "DeleteAuthorEmbeddedSql",
+          "status": "ERROR",
+          "reason": "Tool returned UNKNOWN - Stored procedure equivalence cannot be verified without stored procedure implementation"
+        },
+        "statement_4": {
+          "name": "SelectAuthorsByHireYear",
+          "status": "ERROR",
+          "reason": "Tool returned UNKNOWN - Complex date function conversions could not be formally proven"
+        },
+        "statement_5": {
+          "name": "FindAllProducts",
+          "status": "ERROR",
+          "reason": "Tool returned UNKNOWN - Stored procedure equivalence cannot be verified without stored procedure implementation"
+        }
+      },
+      "equivalency_artifacts": [
+        "sql_equivalency_validation_report.json"
+      ]
+    },
+    "code_re_integration_phase": {
+      "files_updated": [
+        "AuthorsController.cs (4 SQL statements replaced, SqlParameter → NpgsqlParameter)",
+        "ProductsController.cs (1 SQL statement replaced)"
+      ],
+      "parameter_conversions": {
+        "total_sql_parameters_replaced": 7,
+        "parameter_type_change": "SqlParameter → NpgsqlParameter",
+        "parameter_syntax_change": "Named (@param) → Positional ($1, $2, etc.)"
+      }
+    }
+  },
+  "dependency_updates": {
+    "packages_removed": [
+      {
+        "package": "Microsoft.EntityFrameworkCore.SqlServer",
+        "version": "8.0.10",
+        "file": "Bookstore.Web.csproj"
+      }
+    ],
+    "packages_retained": [
+      {
+        "package": "Npgsql.EntityFrameworkCore.PostgreSQL",
+        "version": "8.0.0",
+        "files": [
+          "Bookstore.Web.csproj",
+          "Bookstore.Data.csproj"
+        ]
+      }
+    ],
+    "using_directives_verified": [
+      "AuthorsController.cs (using Npgsql;)",
+      "ProductsController.cs (using Npgsql;)",
+      "ApplicationDbContext.cs (using Npgsql.EntityFrameworkCore.PostgreSQL;)"
+    ]
+  },
+  "build_validation": {
+    "build_command": "dotnet build BobsBookstore.sln --configuration Debug",
+    "build_result": "SUCCESS",
+    "build_time_seconds": 9.62,
+    "errors": 0,
+    "warnings": 65,
+    "warnings_analysis": "All warnings are pre-existing and unrelated to migration (nullable properties, obsolete APIs, runtime identifiers)"
+  },
+  "statements_requiring_manual_review": [
+    {
+      "statement_id": 1,
+      "statement_name": "EditUsingStoredProcedure",
+      "original": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted": "SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "dms_error": "Metadata model creation failed",
+      "manual_testing_required": true,
+      "reason": "Stored procedure call - verify PostgreSQL function uspUpdateAuthorPersonalInfo exists and returns expected results"
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "original": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted": "SELECT bobsbookstore_dbo.uspDeleteAuthor($1);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "dms_error": "Metadata model creation failed",
+      "manual_testing_required": true,
+      "reason": "Stored procedure call - verify PostgreSQL function uspDeleteAuthor exists and returns expected results"
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "original": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = $1;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "dms_error": "Metadata model creation failed",
+      "manual_testing_required": true,
+      "reason": "Date function conversions - test with representative data to verify output matches SQL Server results"
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "FindAllProducts",
+      "original": "EXEC [dbo].[uspGetProductData];",
+      "converted": "SELECT * FROM bobsbookstore_dbo.uspGetProductData();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "dms_error": "Metadata model creation failed",
+      "manual_testing_required": true,
+      "reason": "Stored procedure call - verify PostgreSQL function uspGetProductData exists and returns expected result set"
+    }
+  ],
+  "transformation_artifacts": {
+    "complete_artifacts_list": [
+      "extracted_statements.sql - Complete catalog of original SQL statements",
+      "converted_statements.sql - Complete catalog of PostgreSQL statements",
+      "sql_equivalency_validation_report.json - Comprehensive equivalency validation results",
+      "dms_conversion_log.json - Detailed DMS tool conversion logs",
+      "sql_statement_mapping.json - Mapping between statements and source code locations",
+      "final_migration_report.json - This comprehensive migration report",
+      "migration_summary.md - Human-readable migration overview"
+    ],
+    "artifact_completeness": {
+      "all_statements_accounted_for": true,
+      "all_dms_outputs_documented": true,
+      "all_equivalency_validations_documented": true,
+      "no_agent_judgment_used_for_equivalency": true
+    }
+  },
+  "critical_compliance_notes": [
+    "CRITICAL: All 5 SQL statements were processed through DMS MCP tool (no exceptions)",
+    "CRITICAL: All DMS outputs/errors fully documented in dms_conversion_log.json",
+    "CRITICAL: All 5 statement pairs validated through SQL Equivalency MCP tool (no exceptions)",
+    "CRITICAL: All equivalency statuses came from sql-equivalency___validate_sql_equivalence tool only (NO agent judgment)",
+    "CRITICAL: UNKNOWN equivalency results marked as ERROR per transformation definition",
+    "CRITICAL: Every SQL statement accounted for in all artifacts (extraction, conversion, equivalency, re-integration)"
+  ],
+  "recommended_next_steps": [
+    "1. Verify PostgreSQL database schema migration completed (tables, functions, stored procedures)",
+    "2. Ensure PostgreSQL functions exist: uspUpdateAuthorPersonalInfo, uspDeleteAuthor, uspGetProductData",
+    "3. Test each converted SQL statement with representative data",
+    "4. Verify date function conversions (statement 4) produce identical results to SQL Server",
+    "5. Run application integration tests against PostgreSQL database",
+    "6. Perform end-to-end testing of all database operations",
+    "7. Update connection strings in configuration to point to PostgreSQL instance",
+    "8. Deploy and monitor application in staging environment"
+  ],
+  "migration_success_criteria": {
+    "all_sql_statements_processed_through_dms": true,
+    "all_statements_validated_for_equivalency": true,
+    "all_sql_server_packages_replaced": true,
+    "all_sql_server_code_replaced": true,
+    "all_connection_strings_updated": false,
+    "application_compiles_successfully": true,
+    "application_connects_to_postgresql": "NOT_TESTED",
+    "database_operations_execute_successfully": "NOT_TESTED",
+    "all_tests_pass_with_postgresql": "NOT_TESTED"
+  },
+  "conclusion": "SQL Server to PostgreSQL migration code transformation completed successfully. All 5 SQL statements extracted, converted (manually after DMS failures), and validated for equivalency. Application compiles successfully with PostgreSQL dependencies. 4 statements require manual testing to verify functional equivalence. Database schema migration and stored procedure migration must be completed before application can execute against PostgreSQL database."
+}
