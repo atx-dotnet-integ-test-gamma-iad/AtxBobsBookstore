@@ -1,0 +1,114 @@
+-- ============================================================================
+-- DMS CONVERSION LOG - Manual Conversions After DMS Failures
+-- Date: 2025-01-30
+-- ============================================================================
+-- NOTE: All 5 SQL statements were passed through the DMS MCP tool as required.
+-- All conversions resulted in metadata model creation failures.
+-- Error: "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"
+-- Following transformation definition guidance: Document DMS output and apply manual conversion.
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 1: EditUsingStoredProcedure - uspUpdateAuthorPersonalInfo
+-- ============================================================================
+-- Original SQL Server Statement:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+-- DMS Tool Output:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"}
+-- Conversion Timestamp: 2026-01-30T01:14:35.994093
+
+-- Manual Conversion Rationale:
+-- PostgreSQL does not use DECLARE for variable declaration in the same way as SQL Server.
+-- Stored procedures in PostgreSQL are called using SELECT function_name() syntax.
+-- The schema name bobsbookstore_dbo needs to be checked against actual PostgreSQL schema.
+-- Converted to PostgreSQL function call that returns integer result.
+
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 2: FindAllAuthorsEmbeddedSql - Simple SELECT
+-- ============================================================================
+-- Original SQL Server Statement:
+SELECT * FROM bobsbookstore_dbo.author
+
+-- DMS Tool Output:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"}
+-- Conversion Timestamp: 2026-01-30T01:15:00.632274
+
+-- Manual Conversion Rationale:
+-- Simple SELECT statement requires minimal changes.
+-- Schema reference bobsbookstore_dbo.author is already PostgreSQL compatible.
+-- No SQL Server specific syntax to convert.
+
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 3: DeleteAuthorEmbeddedSql - uspDeleteAuthor
+-- ============================================================================
+-- Original SQL Server Statement:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+-- DMS Tool Output:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"}
+-- Conversion Timestamp: 2026-01-30T01:15:23.570870
+
+-- Manual Conversion Rationale:
+-- Similar to Statement 1, convert EXEC stored procedure to PostgreSQL function call.
+-- Remove DECLARE syntax as PostgreSQL handles this differently.
+-- Function should return integer representing rows affected.
+
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 4: SelectAuthorsByHireYear - Complex SELECT with Date Functions
+-- ============================================================================
+-- Original SQL Server Statement:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+-- DMS Tool Output:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"}
+-- Conversion Timestamp: 2026-01-30T01:15:47.821106
+
+-- Manual Conversion Rationale:
+-- FORMAT() -> to_char() with PostgreSQL format string
+-- DATEDIFF(YEAR, date1, date2) -> DATE_PART('year', AGE(date2, date1))
+-- GETDATE() -> now() or CURRENT_TIMESTAMP
+-- DATEPART(YEAR, date) -> EXTRACT(YEAR FROM date) or DATE_PART('year', date)
+-- SQL Server format string needs conversion to PostgreSQL format codes
+
+-- ============================================================================
+
+-- ============================================================================
+-- STATEMENT 5: FindAllProducts - uspGetProductData
+-- ============================================================================
+-- Original SQL Server Statement:
+EXEC [dbo].[uspGetProductData];
+
+-- DMS Tool Output:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'The selected objects were not found.'}}"}
+-- Conversion Timestamp: 2026-01-30T01:16:10.841920
+
+-- Manual Conversion Rationale:
+-- Convert EXEC stored procedure call to PostgreSQL function call.
+-- Use SELECT * FROM function_name() syntax for PostgreSQL.
+-- Assume function returns a set of Product records.
+
+-- ============================================================================
+-- SUMMARY
+-- ============================================================================
+-- Total Statements Processed: 5
+-- DMS Tool Conversions Successful: 0
+-- DMS Tool Conversions Failed: 5
+-- Manual Conversions Required: 5
+-- Reason for All Failures: Metadata model creation failed - objects not found in DMS project
+-- ============================================================================
