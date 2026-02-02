@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,6 +31,8 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
+                // NOTE: This stored procedure call requires a PostgreSQL function [dbo].[uspGetProductData] to be created in the target database
+                // or needs to be replaced with equivalent EF Core queries
                 string sql = @"EXEC [dbo].[uspGetProductData];";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
