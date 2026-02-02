@@ -1,0 +1,91 @@
+{
+  "number_of_statements_processed": 4,
+  "number_of_statements_equivalent": 1,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 3,
+  "statement_details": [
+    {
+      "statement_number": 1,
+      "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "EditUsingStoredProcedure",
+      "line_number": 159,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.usp_update_author_personal_info(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "Cannot validate equivalency for stored procedure calls without stored procedure/function definitions. The SQL Equivalency tool requires complete CREATE PROCEDURE/FUNCTION DDL statements to validate stored procedure calls. Since the stored procedures uspUpdateAuthorPersonalInfo (SQL Server) and usp_update_author_personal_info (PostgreSQL) are not defined in the validation parameters, equivalency cannot be determined.",
+      "validation_notes": "Statement involves stored procedure call. SQL Equivalency tool cannot validate stored procedure calls without the actual stored procedure definitions. This would require CREATE PROCEDURE (SQL Server) and CREATE FUNCTION (PostgreSQL) DDL statements. Marked as ERROR per transformation definition: 'If the tool returns UNKNOWN or fails, mark as ERROR.'"
+    },
+    {
+      "statement_number": 2,
+      "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql",
+      "line_number": 183,
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": {
+        "equivalence_status": "EQUIVALENT",
+        "result_details": "StructuralEquivalenceVerifier stage in formal methods proved equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-02T07:57:24.394566"
+      },
+      "validation_notes": "Simple SELECT statement validated as EQUIVALENT by SQL Equivalency tool using formal verification method. Statement was already PostgreSQL-compatible and no conversion was needed."
+    },
+    {
+      "statement_number": 3,
+      "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql",
+      "line_number": 207,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.usp_delete_author(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "Cannot validate equivalency for stored procedure calls without stored procedure/function definitions. The SQL Equivalency tool requires complete CREATE PROCEDURE/FUNCTION DDL statements to validate stored procedure calls. Since the stored procedures uspDeleteAuthor (SQL Server) and usp_delete_author (PostgreSQL) are not defined in the validation parameters, equivalency cannot be determined.",
+      "validation_notes": "Statement involves stored procedure call. SQL Equivalency tool cannot validate stored procedure calls without the actual stored procedure definitions. This would require CREATE PROCEDURE (SQL Server) and CREATE FUNCTION (PostgreSQL) DDL statements. Marked as ERROR per transformation definition: 'If the tool returns UNKNOWN or fails, mark as ERROR.'"
+    },
+    {
+      "statement_number": 4,
+      "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear",
+      "line_number": 227,
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "UNKNOWN",
+        "result_details": "Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-02T07:57:37.492057"
+      },
+      "validation_notes": "SQL Equivalency tool returned UNKNOWN status. Per transformation definition: 'If the tool returns UNKNOWN or fails, mark as ERROR.' The tool's formal verification method could not prove equivalency/non-equivalency for complex date function conversions. Marked as ERROR."
+    }
+  ],
+  "summary": {
+    "total_statements": 4,
+    "validation_breakdown": {
+      "equivalent": 1,
+      "non_equivalent": 0,
+      "error": 3
+    },
+    "error_reasons": {
+      "stored_procedure_validation_not_possible": 2,
+      "formal_verification_returned_unknown": 1
+    }
+  },
+  "important_notes": [
+    "ALL 4 SQL statement pairs were validated through the SQL Equivalency MCP tool as required by transformation definition",
+    "NO agent judgment was used to determine equivalency - all equivalency_status values come from SQL Equivalency tool output or are marked ERROR per tool guidelines",
+    "Statements 1 and 3 involve stored procedure calls which cannot be validated without stored procedure definitions",
+    "Statement 4's equivalency could not be determined by formal verification method (returned UNKNOWN), marked as ERROR per transformation definition",
+    "Statement 2 was successfully validated as EQUIVALENT using formal verification method",
+    "The transformation definition requirement has been met: 'CRITICAL: EVERY SQL statement pair (original MS SQL and converted PostgreSQL) MUST be validated through the SQL Equivalency MCP tool'"
+  ],
+  "next_steps": [
+    "Statements marked as ERROR require manual review by database experts",
+    "For stored procedure validations, the actual stored procedure/function implementations would need to be compared manually",
+    "For statement 4, manual testing with sample data may be required to verify functional equivalency"
+  ]
+}
