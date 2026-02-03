@@ -1,0 +1,145 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 1,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 4,
+  "statement_details": [
+    {
+      "statement_number": 1,
+      "statement_name": "EditUsingStoredProcedure",
+      "location": "app/Bookstore.Web/Controllers/AuthorsController.cs - EditUsingStoredProcedure() method",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "UNKNOWN",
+        "result_details": "Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-03T15:52:33.658190"
+      },
+      "notes": "SQL Equivalency tool returned UNKNOWN, which is marked as ERROR per transformation definition requirements. This is a stored procedure conversion from SQL Server EXEC syntax to PostgreSQL function call syntax."
+    },
+    {
+      "statement_number": 2,
+      "statement_name": "FindAllAuthorsEmbeddedSql",
+      "location": "app/Bookstore.Web/Controllers/AuthorsController.cs - FindAllAuthorsEmbeddedSql() method",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": {
+        "equivalence_status": "EQUIVALENT",
+        "result_details": "StructuralEquivalenceVerifier stage in formal methods proved equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-03T15:52:00.521291"
+      },
+      "notes": "SQL Equivalency tool confirmed equivalency. This is a simple SELECT statement that required no conversion - already PostgreSQL compatible."
+    },
+    {
+      "statement_number": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "location": "app/Bookstore.Web/Controllers/AuthorsController.cs - DeleteAuthorEmbeddedSql() method",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor($1);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "UNKNOWN",
+        "result_details": "Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-03T15:52:47.536075"
+      },
+      "notes": "SQL Equivalency tool returned UNKNOWN, which is marked as ERROR per transformation definition requirements. This is a stored procedure conversion from SQL Server EXEC syntax to PostgreSQL function call syntax."
+    },
+    {
+      "statement_number": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "location": "app/Bookstore.Web/Controllers/AuthorsController.cs - SelectAuthorsByHireYear() method",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT \"BusinessEntityID\", TO_CHAR(\"ModifiedDate\", 'YYYY-MM-DD HH24:MI:SS') AS \"FormattedModifiedDate\", DATE_PART('year', AGE(NOW(), \"BirthDate\")) AS \"Age\" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM \"HireDate\") = $1;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "UNKNOWN",
+        "result_details": "Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-03T15:52:16.352970"
+      },
+      "notes": "SQL Equivalency tool returned UNKNOWN, which is marked as ERROR per transformation definition requirements. This is a complex SELECT with SQL Server date functions converted to PostgreSQL equivalents (FORMAT->TO_CHAR, DATEDIFF->DATE_PART+AGE, GETDATE->NOW, DATEPART->EXTRACT)."
+    },
+    {
+      "statement_number": 5,
+      "statement_name": "FindAllProducts",
+      "location": "app/Bookstore.Web/Controllers/ProductsController.cs - FindAllProducts() method",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "UNKNOWN",
+        "result_details": "Z3SqlSolverVerifier stage in formal methods could not prove equivalancy/non-equivalency",
+        "validation_method": "formal_verification",
+        "timestamp": "2026-02-03T17:07:13.634103"
+      },
+      "notes": "SQL Equivalency tool returned UNKNOWN, which is marked as ERROR per transformation definition requirements. This is a stored procedure conversion from SQL Server EXEC syntax to PostgreSQL function call syntax. Follows same pattern as Statements 1 and 3."
+    }
+  ],
+  "summary": {
+    "total_validations_performed": 5,
+    "equivalency_tool_used": "sql-equivalency___validate_sql_equivalence",
+    "agent_judgment_used_for_equivalency": false,
+    "all_statements_validated": true,
+    "validation_approach": "TOOL_ONLY",
+    "tool_results_interpretation": {
+      "EQUIVALENT": "Tool confirmed functional equivalency between SQL Server and PostgreSQL statements",
+      "UNKNOWN_marked_as_ERROR": "Per transformation definition: 'If the tool returns UNKNOWN, mark it as ERROR'. This applies to statements 1, 3, 4, and 5.",
+      "no_agent_substitution": "CRITICAL: No agent judgment was used to determine equivalency. All equivalency statuses come directly from the sql-equivalency___validate_sql_equivalence tool output."
+    }
+  },
+  "compliance_verification": {
+    "every_statement_validated": true,
+    "tool_output_captured_exactly": true,
+    "no_agent_judgment_substituted": true,
+    "unknown_marked_as_error": true,
+    "comprehensive_report_generated": true,
+    "transformation_definition_compliance": "FULL"
+  },
+  "recommendations": {
+    "statements_requiring_review": [
+      {
+        "statement": 1,
+        "reason": "Stored procedure conversion - equivalency could not be formally proven by tool",
+        "recommendation": "Manual testing recommended to verify function behavior matches stored procedure"
+      },
+      {
+        "statement": 3,
+        "reason": "Stored procedure conversion - equivalency could not be formally proven by tool",
+        "recommendation": "Manual testing recommended to verify function behavior matches stored procedure"
+      },
+      {
+        "statement": 4,
+        "reason": "Complex date function conversions - equivalency could not be formally proven by tool",
+        "recommendation": "Manual testing with various date inputs recommended to verify TO_CHAR, DATE_PART+AGE, and EXTRACT produce same results as FORMAT, DATEDIFF, DATEPART"
+      },
+      {
+        "statement": 5,
+        "reason": "Stored procedure conversion - equivalency could not be formally proven by tool",
+        "recommendation": "Manual testing recommended to verify function behavior matches stored procedure uspGetProductData"
+      }
+    ],
+    "statements_ready_for_integration": [
+      {
+        "statement": 2,
+        "reason": "Tool confirmed equivalency - simple SELECT with no conversion needed"
+      }
+    ]
+  },
+  "report_metadata": {
+    "generation_date": "2026-02-03",
+    "transformation_plan_step": "Step 3",
+    "last_updated": "2026-02-03 (Step 3 - Statement 5 added)",
+    "report_purpose": "Comprehensive SQL equivalency validation for SQL Server to PostgreSQL migration",
+    "critical_requirement_met": "EVERY SQL statement pair validated through SQL Equivalency MCP tool with NO agent judgment for equivalency determination"
+  }
+}

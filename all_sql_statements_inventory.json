@@ -1,0 +1,221 @@
+{
+  "inventory_metadata": {
+    "creation_date": "2026-02-03",
+    "transformation_step": "Step 1",
+    "purpose": "Comprehensive inventory of ALL SQL statements in BobsBookstore codebase",
+    "scope": "Complete SQL statement audit for SQL Server to PostgreSQL migration"
+  },
+  "summary": {
+    "total_sql_statements_found": 5,
+    "statements_already_migrated": 4,
+    "statements_pending_migration": 1,
+    "statements_in_authorscontroller": 4,
+    "statements_in_productscontroller": 1
+  },
+  "sql_statements": [
+    {
+      "statement_id": 1,
+      "statement_name": "EditUsingStoredProcedure",
+      "location": {
+        "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+        "method": "EditUsingStoredProcedure()",
+        "line_approx": 158
+      },
+      "sql_type": "Stored Procedure Call",
+      "original_sql_server_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "current_code_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5)",
+      "processing_status": "ALREADY_MIGRATED",
+      "migration_applied": true,
+      "dms_tool_attempted": true,
+      "dms_tool_result": "FAILED",
+      "manual_conversion_applied": true,
+      "equivalency_validation_performed": true,
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "UNKNOWN",
+      "notes": "Successfully migrated in previous transformation. Using PostgreSQL function call syntax with positional parameters. Equivalency tool could not formally prove equivalency (UNKNOWN result marked as ERROR)."
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "FindAllAuthorsEmbeddedSql",
+      "location": {
+        "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+        "method": "FindAllAuthorsEmbeddedSql()",
+        "line_approx": 177
+      },
+      "sql_type": "Simple SELECT",
+      "original_sql_server_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "current_code_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "processing_status": "ALREADY_MIGRATED",
+      "migration_applied": true,
+      "dms_tool_attempted": true,
+      "dms_tool_result": "FAILED",
+      "manual_conversion_applied": false,
+      "equivalency_validation_performed": true,
+      "equivalency_status": "EQUIVALENT",
+      "equivalency_tool_output": "EQUIVALENT",
+      "notes": "Successfully validated in previous transformation. No conversion needed - statement is PostgreSQL compatible. Equivalency tool confirmed EQUIVALENT."
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "DeleteAuthorEmbeddedSql",
+      "location": {
+        "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+        "method": "DeleteAuthorEmbeddedSql()",
+        "line_approx": 193
+      },
+      "sql_type": "Stored Procedure Call",
+      "original_sql_server_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "current_code_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor($1)",
+      "processing_status": "ALREADY_MIGRATED",
+      "migration_applied": true,
+      "dms_tool_attempted": true,
+      "dms_tool_result": "FAILED",
+      "manual_conversion_applied": true,
+      "equivalency_validation_performed": true,
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "UNKNOWN",
+      "notes": "Successfully migrated in previous transformation. Using PostgreSQL function call syntax with positional parameter. Equivalency tool could not formally prove equivalency (UNKNOWN result marked as ERROR)."
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SelectAuthorsByHireYear",
+      "location": {
+        "file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+        "method": "SelectAuthorsByHireYear()",
+        "line_approx": 211
+      },
+      "sql_type": "Complex SELECT with Date Functions",
+      "original_sql_server_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "current_code_statement": "SELECT \"BusinessEntityID\", TO_CHAR(\"ModifiedDate\", 'YYYY-MM-DD HH24:MI:SS') AS \"FormattedModifiedDate\", DATE_PART('year', AGE(NOW(), \"BirthDate\")) AS \"Age\" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM \"HireDate\") = $1",
+      "processing_status": "ALREADY_MIGRATED",
+      "migration_applied": true,
+      "dms_tool_attempted": true,
+      "dms_tool_result": "FAILED",
+      "manual_conversion_applied": true,
+      "equivalency_validation_performed": true,
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "UNKNOWN",
+      "sql_server_functions_converted": [
+        "FORMAT() → TO_CHAR()",
+        "DATEDIFF() → DATE_PART() with AGE()",
+        "GETDATE() → NOW()",
+        "DATEPART() → EXTRACT()"
+      ],
+      "notes": "Successfully migrated in previous transformation. Complex date function conversions applied. Equivalency tool could not formally prove equivalency (UNKNOWN result marked as ERROR)."
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "FindAllProducts",
+      "location": {
+        "file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+        "method": "FindAllProducts()",
+        "line_approx": 31
+      },
+      "sql_type": "Stored Procedure Call",
+      "original_sql_server_statement": "EXEC [dbo].[uspGetProductData];",
+      "current_code_statement": "EXEC [dbo].[uspGetProductData];",
+      "processing_status": "NOT_MIGRATED",
+      "migration_applied": false,
+      "dms_tool_attempted": false,
+      "dms_tool_result": null,
+      "manual_conversion_applied": false,
+      "equivalency_validation_performed": false,
+      "equivalency_status": null,
+      "equivalency_tool_output": null,
+      "notes": "NOT YET MIGRATED - This statement still contains SQL Server syntax (EXEC [dbo].[procedure]) and needs conversion to PostgreSQL function call syntax. This statement was identified but not processed in the previous migration attempt."
+    }
+  ],
+  "gap_analysis": {
+    "previous_report_statement_count": 4,
+    "current_inventory_statement_count": 5,
+    "newly_identified_statements": 1,
+    "missed_in_previous_migration": [
+      {
+        "statement_id": 5,
+        "statement_name": "FindAllProducts",
+        "location": "app/Bookstore.Web/Controllers/ProductsController.cs",
+        "reason": "Previous final_migration_report.txt lists this as 'Statement 5: Out of Scope' but it still contains SQL Server syntax that needs migration"
+      }
+    ],
+    "statements_requiring_processing": [
+      {
+        "statement_id": 5,
+        "statement_name": "FindAllProducts",
+        "actions_needed": [
+          "Process through DMS MCP tool (dms-mcp____statement_conversion_tool)",
+          "Apply conversion (manual if DMS fails)",
+          "Re-integrate converted SQL into ProductsController.cs",
+          "Validate through SQL Equivalency MCP tool (sql-equivalency___validate_sql_equivalence)",
+          "Update equivalency report with validation results"
+        ]
+      }
+    ]
+  },
+  "package_dependency_status": {
+    "sql_server_packages_found": false,
+    "npgsql_packages_found": true,
+    "details": {
+      "Bookstore.Web.csproj": {
+        "has_npgsql": true,
+        "has_sqlclient": false,
+        "packages": [
+          "Npgsql 8.0.0",
+          "Npgsql.EntityFrameworkCore.PostgreSQL 8.0.0"
+        ]
+      },
+      "Bookstore.Data.csproj": {
+        "has_npgsql": true,
+        "has_sqlclient": false,
+        "packages": [
+          "Npgsql.EntityFrameworkCore.PostgreSQL 8.0.0"
+        ]
+      }
+    },
+    "compliance_status": "COMPLIANT - All SQL Server packages removed, Npgsql packages present"
+  },
+  "using_statements_status": {
+    "sql_server_using_found": false,
+    "npgsql_using_found": true,
+    "files_checked": [
+      "app/Bookstore.Web/Controllers/AuthorsController.cs - uses Npgsql",
+      "app/Bookstore.Web/Controllers/ProductsController.cs - uses Npgsql"
+    ],
+    "compliance_status": "COMPLIANT - No SQL Server using statements, Npgsql imported where needed"
+  },
+  "existing_artifacts_review": {
+    "sql_equivalency_validation_report_exists": true,
+    "sql_equivalency_validation_report_statement_count": 4,
+    "final_migration_report_exists": true,
+    "final_migration_report_statement_count": 5,
+    "extracted_statements_exists": true,
+    "converted_statements_exists": true,
+    "dms_conversion_log_exists": true,
+    "artifacts_completeness": "INCOMPLETE - Statement 5 (FindAllProducts) identified but not processed through DMS and equivalency tools"
+  },
+  "compliance_verification": {
+    "all_statements_identified": true,
+    "all_statements_processed_through_dms": false,
+    "all_statements_validated_through_equivalency": false,
+    "reason_for_non_compliance": "Statement 5 (FindAllProducts in ProductsController) has not been processed through DMS MCP tool or validated through SQL Equivalency MCP tool",
+    "actions_required_for_compliance": [
+      "Process Statement 5 through DMS MCP tool in Step 2",
+      "Validate Statement 5 through SQL Equivalency MCP tool in Step 3",
+      "Update all artifacts to include Statement 5 results"
+    ]
+  },
+  "recommendations": {
+    "immediate_actions": [
+      "Process Statement 5 (FindAllProducts) through DMS MCP tool",
+      "Convert SQL Server EXEC syntax to PostgreSQL function call syntax",
+      "Update ProductsController.cs with converted statement",
+      "Validate Statement 5 equivalency through SQL Equivalency MCP tool",
+      "Update sql_equivalency_validation_report.json to include Statement 5",
+      "Regenerate final_migration_report.txt with complete 5-statement results"
+    ],
+    "validation_needed": [
+      "Verify uspGetProductData PostgreSQL function exists in database",
+      "Test ProductsController.Index() after conversion",
+      "Ensure schema name (bobsbookstore_dbo) is preserved in conversion"
+    ]
+  }
+}

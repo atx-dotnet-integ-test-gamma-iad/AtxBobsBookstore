@@ -1,0 +1,350 @@
+===============================================================================
+CODE INTEGRATION VERIFICATION REPORT
+SQL Server to PostgreSQL Migration - BobsBookstore Project
+Date: 2026-02-03
+Transformation Step: Step 4 - Verify Code Integration
+===============================================================================
+
+EXECUTIVE SUMMARY
+-----------------
+All 5 converted PostgreSQL SQL statements have been successfully integrated
+into the source code, replacing the original SQL Server statements. All SQL
+Server-specific syntax has been removed, and PostgreSQL syntax with correct
+schema names and parameter usage has been verified.
+
+===============================================================================
+1. STATEMENT-BY-STATEMENT CODE INTEGRATION VERIFICATION
+===============================================================================
+
+STATEMENT 1: EditUsingStoredProcedure
+Location: app/Bookstore.Web/Controllers/AuthorsController.cs (line ~158)
+Method: EditUsingStoredProcedure()
+Expected PostgreSQL: SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5)
+Actual in Code: SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5)
+SQL Server Syntax Removed: ✓ (DECLARE @rowsAffected INT; EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo])
+PostgreSQL Syntax Present: ✓
+Parameter Usage: NpgsqlParameter (5 parameters) ✓
+Schema Name: bobsbookstore_dbo ✓
+Integration Status: VERIFIED ✓
+
+STATEMENT 2: FindAllAuthorsEmbeddedSql
+Location: app/Bookstore.Web/Controllers/AuthorsController.cs (line ~177)
+Method: FindAllAuthorsEmbeddedSql()
+Expected PostgreSQL: SELECT * FROM bobsbookstore_dbo.author
+Actual in Code: SELECT * FROM bobsbookstore_dbo.author
+SQL Server Syntax Removed: N/A (already PostgreSQL compatible)
+PostgreSQL Syntax Present: ✓
+Parameter Usage: None ✓
+Schema Name: bobsbookstore_dbo ✓
+Integration Status: VERIFIED ✓
+
+STATEMENT 3: DeleteAuthorEmbeddedSql
+Location: app/Bookstore.Web/Controllers/AuthorsController.cs (line ~193)
+Method: DeleteAuthorEmbeddedSql()
+Expected PostgreSQL: SELECT bobsbookstore_dbo.uspdeleteauthor($1)
+Actual in Code: SELECT bobsbookstore_dbo.uspdeleteauthor($1)
+SQL Server Syntax Removed: ✓ (DECLARE @rowsAffected INT; EXEC @rowsAffected = [dbo].[uspDeleteAuthor])
+PostgreSQL Syntax Present: ✓
+Parameter Usage: NpgsqlParameter (1 parameter) ✓
+Schema Name: bobsbookstore_dbo ✓
+Integration Status: VERIFIED ✓
+
+STATEMENT 4: SelectAuthorsByHireYear
+Location: app/Bookstore.Web/Controllers/AuthorsController.cs (line ~211)
+Method: SelectAuthorsByHireYear()
+Expected PostgreSQL: SELECT "BusinessEntityID", TO_CHAR("ModifiedDate", 'YYYY-MM-DD HH24:MI:SS') AS "FormattedModifiedDate", DATE_PART('year', AGE(NOW(), "BirthDate")) AS "Age" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM "HireDate") = $1
+Actual in Code: SELECT "BusinessEntityID", TO_CHAR("ModifiedDate", 'YYYY-MM-DD HH24:MI:SS') AS "FormattedModifiedDate", DATE_PART('year', AGE(NOW(), "BirthDate")) AS "Age" FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM "HireDate") = $1
+SQL Server Syntax Removed: ✓ (FORMAT(), DATEDIFF(), GETDATE(), DATEPART())
+PostgreSQL Syntax Present: ✓ (TO_CHAR(), DATE_PART(), AGE(), NOW(), EXTRACT())
+Parameter Usage: NpgsqlParameter (1 parameter) ✓
+Schema Name: bobsbookstore_dbo ✓
+Integration Status: VERIFIED ✓
+
+STATEMENT 5: FindAllProducts
+Location: app/Bookstore.Web/Controllers/ProductsController.cs (line ~31)
+Method: FindAllProducts()
+Expected PostgreSQL: SELECT bobsbookstore_dbo.uspgetproductdata();
+Actual in Code: SELECT bobsbookstore_dbo.uspgetproductdata();
+SQL Server Syntax Removed: ✓ (EXEC [dbo].[uspGetProductData];)
+PostgreSQL Syntax Present: ✓
+Parameter Usage: None (no parameters needed) ✓
+Schema Name: bobsbookstore_dbo ✓
+Integration Status: VERIFIED ✓ [UPDATED IN STEP 4]
+
+===============================================================================
+2. SQL SERVER SYNTAX REMOVAL VERIFICATION
+===============================================================================
+
+Checked for SQL Server-specific patterns across all controllers:
+
+DECLARE @variable Statements:
+Command: grep -r "DECLARE @" app/Bookstore.Web/Controllers/*.cs
+Result: NOT FOUND ✓
+
+EXEC [schema].[procedure] Syntax:
+Command: grep -r "EXEC \[dbo\]" app/Bookstore.Web/Controllers/*.cs
+Result: NOT FOUND ✓
+
+Bracket Notation [schema].[object]:
+Visual inspection: None remaining in SQL statements ✓
+
+SQL Server Date/Time Functions:
+- FORMAT(): NOT FOUND ✓ (replaced with TO_CHAR())
+- DATEDIFF(): NOT FOUND ✓ (replaced with DATE_PART() and AGE())
+- GETDATE(): NOT FOUND ✓ (replaced with NOW())
+- DATEPART(): NOT FOUND ✓ (replaced with EXTRACT())
+
+SUMMARY: All SQL Server-specific syntax has been successfully removed ✓
+
+===============================================================================
+3. POSTGRESQL SYNTAX ADOPTION VERIFICATION
+===============================================================================
+
+Schema.function($1, $2) for Stored Procedures:
+- Statement 1: bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5) ✓
+- Statement 3: bobsbookstore_dbo.uspdeleteauthor($1) ✓
+- Statement 5: bobsbookstore_dbo.uspgetproductdata() ✓
+
+Positional Parameters ($1, $2, etc.):
+- Statement 1: Uses $1, $2, $3, $4, $5 ✓
+- Statement 3: Uses $1 ✓
+- Statement 4: Uses $1 ✓
+
+PostgreSQL Date/Time Functions:
+- TO_CHAR(): Present in Statement 4 ✓
+- DATE_PART(): Present in Statement 4 ✓
+- AGE(): Present in Statement 4 ✓
+- NOW(): Present in Statement 4 ✓
+- EXTRACT(): Present in Statement 4 ✓
+
+Case-Sensitive Identifiers (Double Quotes):
+- Statement 4: "BusinessEntityID", "ModifiedDate", "FormattedModifiedDate", "Age", "BirthDate", "HireDate" ✓
+
+Schema Names:
+Command: grep -c "bobsbookstore_dbo" AuthorsController.cs ProductsController.cs
+Result: 5 occurrences (1 per statement) ✓
+
+SUMMARY: All PostgreSQL syntax correctly adopted ✓
+
+===============================================================================
+4. PARAMETER USAGE VERIFICATION
+===============================================================================
+
+NpgsqlParameter Usage:
+Command: grep -c "NpgsqlParameter" app/Bookstore.Web/Controllers/AuthorsController.cs
+Result: 7 occurrences ✓
+
+SqlParameter Usage:
+Command: grep -c "SqlParameter" app/Bookstore.Web/Controllers/*.cs
+Result: 0 occurrences ✓
+
+Using Statement Verification:
+AuthorsController.cs: using Npgsql; ✓
+ProductsController.cs: using Npgsql; ✓
+
+Parameter Binding Verification:
+- Statement 1: 5 NpgsqlParameter instances (businessEntityId, nationalIdNumber, birthDate, maritalStatus, gender) ✓
+- Statement 3: 1 NpgsqlParameter instance (businessEntityId) ✓
+- Statement 4: 1 NpgsqlParameter instance (hireYear) ✓
+- Statement 5: 0 parameters (procedure takes no inputs) ✓
+
+SUMMARY: All parameter usage is correct with NpgsqlParameter ✓
+
+===============================================================================
+5. SCHEMA NAME CONSISTENCY VERIFICATION
+===============================================================================
+
+DMS Conversion Schema Names (from converted_statements.sql):
+- Statement 1: bobsbookstore_dbo.uspupdateauthorpersonalinfo
+- Statement 2: bobsbookstore_dbo.author
+- Statement 3: bobsbookstore_dbo.uspdeleteauthor
+- Statement 4: bobsbookstore_dbo.author
+- Statement 5: bobsbookstore_dbo.uspgetproductdata
+
+Code Integration Schema Names:
+- Statement 1: bobsbookstore_dbo.uspupdateauthorpersonalinfo ✓
+- Statement 2: bobsbookstore_dbo.author ✓
+- Statement 3: bobsbookstore_dbo.uspdeleteauthor ✓
+- Statement 4: bobsbookstore_dbo.author ✓
+- Statement 5: bobsbookstore_dbo.uspgetproductdata ✓
+
+Function Name Case Verification:
+All function names lowercased as per PostgreSQL conventions:
+- uspUpdateAuthorPersonalInfo → uspupdateauthorpersonalinfo ✓
+- uspDeleteAuthor → uspdeleteauthor ✓
+- uspGetProductData → uspgetproductdata ✓
+
+SUMMARY: Schema names match DMS conversions exactly ✓
+
+===============================================================================
+6. CROSS-REFERENCE WITH EQUIVALENCY REPORT
+===============================================================================
+
+Statement 1 (EditUsingStoredProcedure):
+Equivalency Status: ERROR (UNKNOWN from tool)
+Code Integration: VERIFIED ✓
+Recommendation: Manual testing required
+
+Statement 2 (FindAllAuthorsEmbeddedSql):
+Equivalency Status: EQUIVALENT
+Code Integration: VERIFIED ✓
+Recommendation: Ready for use ✓
+
+Statement 3 (DeleteAuthorEmbeddedSql):
+Equivalency Status: ERROR (UNKNOWN from tool)
+Code Integration: VERIFIED ✓
+Recommendation: Manual testing required
+
+Statement 4 (SelectAuthorsByHireYear):
+Equivalency Status: ERROR (UNKNOWN from tool)
+Code Integration: VERIFIED ✓
+Recommendation: Manual testing required
+
+Statement 5 (FindAllProducts):
+Equivalency Status: ERROR (UNKNOWN from tool)
+Code Integration: VERIFIED ✓ [UPDATED IN STEP 4]
+Recommendation: Manual testing required
+
+CONSISTENCY CHECK: All statements with ERROR status are integrated but
+flagged for manual testing. Statement 2 (EQUIVALENT) is ready for use.
+
+===============================================================================
+7. FILES MODIFIED IN STEP 4
+===============================================================================
+
+1. app/Bookstore.Web/Controllers/ProductsController.cs
+   - Line ~31: FindAllProducts() method
+   - Changed: EXEC [dbo].[uspGetProductData];
+   - To: SELECT bobsbookstore_dbo.uspgetproductdata();
+   - Reason: Convert SQL Server stored procedure call to PostgreSQL function call
+   - Status: Successfully updated ✓
+
+Note: AuthorsController.cs was already updated in previous migration (Statements 1-4).
+No additional changes needed in Step 4 for AuthorsController.
+
+===============================================================================
+8. CODE QUALITY CHECKS
+===============================================================================
+
+StringBuilder-Constructed SQL: None found ✓
+String Concatenation SQL: None found ✓
+Transaction Blocks: Verified to maintain atomicity ✓
+Multi-Statement Batches: None found ✓
+
+Error Handling:
+- All SQL execution methods have try-catch blocks ✓
+- Exceptions logged to console ✓
+- Graceful error returns (empty lists or false) ✓
+
+Code Readability:
+- SQL statements use verbatim string literals (@"...") ✓
+- Proper indentation and formatting ✓
+- Descriptive method names ✓
+
+===============================================================================
+9. VERIFICATION RESULTS SUMMARY
+===============================================================================
+
+Total SQL Statements: 5
+Statements Integrated: 5 ✓
+SQL Server Syntax Removed: 5/5 ✓
+PostgreSQL Syntax Present: 5/5 ✓
+NpgsqlParameter Usage Correct: 5/5 ✓
+Schema Names Correct: 5/5 ✓
+Function Names Lowercased: 3/3 ✓ (Statements 1, 3, 5)
+
+Controllers Verified:
+- AuthorsController.cs: 4 statements verified ✓
+- ProductsController.cs: 1 statement verified ✓
+
+SQL Server Patterns Checked:
+- DECLARE @variable: NOT FOUND ✓
+- EXEC [schema].[procedure]: NOT FOUND ✓
+- FORMAT(): NOT FOUND ✓
+- DATEDIFF(): NOT FOUND ✓
+- GETDATE(): NOT FOUND ✓
+- DATEPART(): NOT FOUND ✓
+- SqlParameter: NOT FOUND ✓
+
+PostgreSQL Patterns Verified:
+- SELECT schema.function(): PRESENT ✓
+- Positional parameters ($1, $2): PRESENT ✓
+- TO_CHAR(): PRESENT ✓
+- DATE_PART(): PRESENT ✓
+- AGE(): PRESENT ✓
+- NOW(): PRESENT ✓
+- EXTRACT(): PRESENT ✓
+- NpgsqlParameter: PRESENT ✓
+- bobsbookstore_dbo schema: PRESENT ✓
+
+===============================================================================
+10. COMPLIANCE WITH TRANSFORMATION DEFINITION
+===============================================================================
+
+Requirement: Confirm all converted PostgreSQL statements integrated
+Status: COMPLIANT ✓
+Evidence: All 5 statements present in code with correct PostgreSQL syntax
+
+Requirement: Original SQL Server statements removed
+Status: COMPLIANT ✓
+Evidence: No SQL Server syntax found in code
+
+Requirement: Correct parameter syntax (positional parameters)
+Status: COMPLIANT ✓
+Evidence: All parameters use $1, $2, etc. format
+
+Requirement: Schema names match DMS conversions
+Status: COMPLIANT ✓
+Evidence: All statements use bobsbookstore_dbo schema as per DMS output
+
+Requirement: Function names match DMS output (lowercased)
+Status: COMPLIANT ✓
+Evidence: All function names lowercased (uspupdateauthorpersonalinfo, etc.)
+
+Requirement: NpgsqlParameter used (not SqlParameter)
+Status: COMPLIANT ✓
+Evidence: 7 NpgsqlParameter occurrences, 0 SqlParameter occurrences
+
+Requirement: Cross-reference with equivalency report
+Status: COMPLIANT ✓
+Evidence: All statements cross-referenced, ERROR statuses documented
+
+===============================================================================
+11. ISSUES AND DISCREPANCIES
+===============================================================================
+
+No issues or discrepancies found. All converted SQL statements have been
+successfully integrated into the source code with correct PostgreSQL syntax,
+proper schema names, and appropriate parameter usage.
+
+Statement 5 (FindAllProducts) was the only remaining statement requiring
+code integration in Step 4, and it has been successfully updated.
+
+===============================================================================
+12. RECOMMENDATIONS
+===============================================================================
+
+READY FOR NEXT STEP:
+✓ All code integration is complete and verified
+✓ Proceed to Step 5: Verify and Update Package Dependencies and Imports
+✓ Proceed to Step 6: Verify Connection String Configuration for PostgreSQL
+✓ Proceed to Step 7: Build Verification and Final Migration Report
+
+MANUAL TESTING REQUIRED (Post-Migration):
+The following statements have equivalency status ERROR and should be manually
+tested after PostgreSQL functions are created:
+1. Statement 1: EditUsingStoredProcedure (uspupdateauthorpersonalinfo)
+2. Statement 3: DeleteAuthorEmbeddedSql (uspdeleteauthor)
+3. Statement 4: SelectAuthorsByHireYear (complex date functions)
+4. Statement 5: FindAllProducts (uspgetproductdata)
+
+STATEMENT READY FOR USE:
+- Statement 2: FindAllAuthorsEmbeddedSql (equivalency confirmed)
+
+===============================================================================
+Report Generated: 2026-02-03
+Transformation Step: Step 4
+Total Statements Verified: 5
+Code Integration Status: COMPLETE
+Compliance Status: FULLY COMPLIANT
+===============================================================================
