@@ -1,0 +1,160 @@
+========================================================================
+DMS MCP TOOL CONVERSION LOG
+SQL Server to PostgreSQL - Bob's Bookstore Application
+========================================================================
+
+SUMMARY:
+- Total Statements Processed: 5
+- Successfully Converted by DMS Tool: 0
+- Failed Conversions Requiring Manual Intervention: 5
+- All statements failed with error: "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+
+========================================================================
+STATEMENT 1: Update Author Personal Info via Stored Procedure
+========================================================================
+Original SQL (MS SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+DMS Tool Input:
+{
+  "schema_name": "bobsbookstore_dbo",
+  "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;"
+}
+
+DMS Tool Output:
+{
+  "conversion_timestamp": "2026-02-09T21:40:28.424195",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-09T21:40:32.943548"
+}
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+Conversion Notes:
+- SQL Server DECLARE/EXEC pattern converted to PostgreSQL function call SELECT
+- Stored procedure name converted to lowercase with schema prefix (bobsbookstore_dbo.uspupdateauthorpersonalinfo)
+- PostgreSQL functions return values directly, no need for output parameter
+- Parameter names preserved with @ prefix (Npgsql supports this syntax)
+
+========================================================================
+STATEMENT 2: Delete Author via Stored Procedure
+========================================================================
+Original SQL (MS SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Input:
+{
+  "schema_name": "bobsbookstore_dbo",
+  "sql_text": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;"
+}
+
+DMS Tool Output:
+{
+  "conversion_timestamp": "2026-02-09T21:40:42.545964",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-09T21:40:46.853805"
+}
+
+Manual Conversion (PostgreSQL):
+SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);
+
+Conversion Notes:
+- SQL Server DECLARE/EXEC pattern converted to PostgreSQL function call SELECT
+- Stored procedure name converted to lowercase with schema prefix (bobsbookstore_dbo.uspdeleteauthor)
+- PostgreSQL functions return values directly
+- Parameter name preserved with @ prefix
+
+========================================================================
+STATEMENT 3: Select Authors by Hire Year with T-SQL Functions
+========================================================================
+Original SQL (MS SQL Server):
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Input:
+{
+  "schema_name": "bobsbookstore_dbo",
+  "sql_text": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;"
+}
+
+DMS Tool Output:
+{
+  "conversion_timestamp": "2026-02-09T21:40:56.247572",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-09T21:41:00.668078"
+}
+
+Manual Conversion (PostgreSQL):
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format pattern
+- 'yyyy-MM-dd HH:mm:ss' converted to 'YYYY-MM-DD HH24:MI:SS' (PostgreSQL format)
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate))
+- GETDATE() converted to CURRENT_DATE
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Schema and table name preserved (bobsbookstore_dbo.author)
+
+========================================================================
+STATEMENT 4: Select All Authors from Table
+========================================================================
+Original SQL (MS SQL Server):
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Input:
+{
+  "schema_name": "bobsbookstore_dbo",
+  "sql_text": "SELECT * FROM bobsbookstore_dbo.author"
+}
+
+DMS Tool Output:
+{
+  "conversion_timestamp": "2026-02-09T21:41:07.932178",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-09T21:41:12.501083"
+}
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- Statement is already PostgreSQL compatible
+- No conversion needed
+- Schema and table name preserved (bobsbookstore_dbo.author)
+
+========================================================================
+STATEMENT 5: Get Product Data via Stored Procedure
+========================================================================
+Original SQL (MS SQL Server):
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Input:
+{
+  "schema_name": "bobsbookstore_dbo",
+  "sql_text": "EXEC [dbo].[uspGetProductData];"
+}
+
+DMS Tool Output:
+{
+  "conversion_timestamp": "2026-02-09T21:41:23.747353",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-09T21:41:27.907096"
+}
+
+Manual Conversion (PostgreSQL):
+SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
+
+Conversion Notes:
+- SQL Server EXEC converted to PostgreSQL SELECT FROM function call
+- Stored procedure name converted to lowercase with schema prefix (bobsbookstore_dbo.uspgetproductdata)
+- Added () for function call syntax
+- PostgreSQL functions that return tables are called with SELECT * FROM
+
+========================================================================
+END OF DMS CONVERSION LOG
+========================================================================
