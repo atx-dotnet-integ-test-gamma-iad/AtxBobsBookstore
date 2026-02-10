@@ -1,0 +1,81 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "statement_id": "AuthorsController_EditUsingStoredProcedure",
+      "source_file": "AuthorsController.cs",
+      "source_line": 162,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"conversion_timestamp\": \"2026-02-10T02:17:06.059235\", \"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}\", \"error_timestamp\": \"2026-02-10T02:17:09.346564\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-10T02:20:18.008041\"}"
+    },
+    {
+      "statement_id": "AuthorsController_FindAllAuthorsEmbeddedSql",
+      "source_file": "AuthorsController.cs",
+      "source_line": 191,
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"conversion_timestamp\": \"2026-02-10T02:17:17.973296\", \"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}\", \"error_timestamp\": \"2026-02-10T02:17:21.296169\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-10T02:19:51.954604\"}"
+    },
+    {
+      "statement_id": "AuthorsController_DeleteAuthorEmbeddedSql",
+      "source_file": "AuthorsController.cs",
+      "source_line": 207,
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"conversion_timestamp\": \"2026-02-10T02:17:29.721426\", \"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}\", \"error_timestamp\": \"2026-02-10T02:17:32.576665\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-10T02:20:27.594731\"}"
+    },
+    {
+      "statement_id": "AuthorsController_SelectAuthorsByHireYear",
+      "source_file": "AuthorsController.cs",
+      "source_line": 227,
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate",
+      "converted_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"conversion_timestamp\": \"2026-02-10T02:17:40.822917\", \"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}\", \"error_timestamp\": \"2026-02-10T02:17:43.826703\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-10T02:20:02.274895\"}"
+    },
+    {
+      "statement_id": "ProductsController_FindAllProducts",
+      "source_file": "ProductsController.cs",
+      "source_line": 31,
+      "original_statement": "EXEC [dbo].[uspGetProductData]",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata()",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "dms_tool_output": "{\"conversion_timestamp\": \"2026-02-10T02:17:51.591121\", \"status\": \"error\", \"error\": \"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}\", \"error_timestamp\": \"2026-02-10T02:17:54.703030\"}",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-10T02:20:37.037609\"}"
+    }
+  ],
+  "summary": {
+    "dms_conversion_status": "All 5 statements failed DMS conversion due to metadata model creation error. Manual conversions were applied after DMS failure as required by transformation definition.",
+    "equivalency_validation_status": "All 5 statement pairs were validated through the SQL Equivalency tool as required. All returned ERROR status with error: 'uniqueID'.",
+    "critical_notes": [
+      "ALL statements were processed through DMS MCP tool (no exceptions)",
+      "ALL statement pairs were validated through SQL Equivalency tool (no exceptions)",
+      "Equivalency status comes from the tool, NOT from agent judgment",
+      "ERROR status marked as returned by the tool, NOT based on agent assessment",
+      "Manual conversions applied only AFTER DMS failure",
+      "All conversions documented with full tool outputs"
+    ],
+    "manual_review_required": [
+      "All 5 statements require manual testing due to tool errors",
+      "PostgreSQL functions (uspupdateauthorpersonalinfo, uspdeleteauthor, uspgetproductdata) must be created in database",
+      "Date/time function conversions (TO_CHAR, AGE, EXTRACT) need testing with sample data",
+      "Stored procedure to function migrations need validation"
+    ]
+  }
+}
