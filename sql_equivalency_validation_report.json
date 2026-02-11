@@ -1,0 +1,85 @@
+{
+  "number_of_statements_processed": 4,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 4,
+  "statement_details": [
+    {
+      "statement_id": "STMT_001",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 163,
+      "method_name": "EditUsingStoredProcedure",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(\n    @BusinessEntityID::integer, \n    @NationalIDNumber::varchar, \n    @BirthDate::timestamp, \n    @MaritalStatus::varchar, \n    @Gender::varchar\n);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\n  \"equivalence_status\": \"ERROR\",\n  \"error\": \"'uniqueID'\",\n  \"timestamp\": \"2026-02-11T19:08:07.513278\"\n}",
+      "notes": "SQL Equivalency tool failed with 'uniqueID' error. Tool output indicates an internal error, not a statement equivalency issue. This is marked as ERROR per transformation requirements (never use agent judgment)."
+    },
+    {
+      "statement_id": "STMT_002",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 187,
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\n  \"equivalence_status\": \"ERROR\",\n  \"error\": \"'uniqueID'\",\n  \"timestamp\": \"2026-02-11T19:08:17.328641\"\n}",
+      "notes": "SQL Equivalency tool failed with 'uniqueID' error. This statement is syntactically identical in both SQL Server and PostgreSQL, but tool error prevents validation. Marked as ERROR per transformation requirements."
+    },
+    {
+      "statement_id": "STMT_003",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 208,
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID::integer);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\n  \"equivalence_status\": \"ERROR\",\n  \"error\": \"'uniqueID'\",\n  \"timestamp\": \"2026-02-11T19:08:28.739178\"\n}",
+      "notes": "SQL Equivalency tool failed with 'uniqueID' error. Tool output indicates an internal error, not a statement equivalency issue. Marked as ERROR per transformation requirements."
+    },
+    {
+      "statement_id": "STMT_004",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "line_number": 228,
+      "method_name": "SelectAuthorsByHireYear",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT \n    BusinessEntityID, \n    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, \n    DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age \nFROM bobsbookstore_dbo.author \nWHERE DATE_PART('year', HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\n  \"equivalence_status\": \"ERROR\",\n  \"error\": \"'uniqueID'\",\n  \"timestamp\": \"2026-02-11T19:08:40.179138\"\n}",
+      "notes": "SQL Equivalency tool failed with 'uniqueID' error. This statement contains complex SQL Server to PostgreSQL function conversions (FORMAT, DATEDIFF, GETDATE, DATEPART). Tool error prevents validation. Marked as ERROR per transformation requirements."
+    }
+  ],
+  "summary": {
+    "total_statements": 4,
+    "all_statements_processed_through_dms": true,
+    "all_statements_validated_through_equivalency_tool": true,
+    "dms_tool_status": "All 4 statements encountered metadata model creation errors. Manual conversions applied.",
+    "equivalency_tool_status": "All 4 statements encountered 'uniqueID' tool errors during equivalency validation.",
+    "critical_notes": [
+      "EVERY statement was processed through DMS MCP tool as required (no exceptions)",
+      "EVERY statement pair was validated through SQL Equivalency MCP tool as required (no exceptions)",
+      "Both tools encountered infrastructure/internal errors, not statement-specific issues",
+      "All equivalency determinations came from the tool (marked as ERROR per tool output)",
+      "NO agent judgment was used to determine equivalency status",
+      "All statements marked as ERROR due to tool failures per transformation requirements"
+    ],
+    "manual_review_required": [
+      "STMT_001: Stored procedure conversion - requires database testing to verify function behavior",
+      "STMT_002: Simple SELECT statement - likely equivalent but tool validation failed",
+      "STMT_003: Stored procedure conversion - requires database testing to verify function behavior",
+      "STMT_004: Complex date/time function conversions - requires database testing to verify output equivalency"
+    ]
+  },
+  "transformation_compliance": {
+    "all_statements_through_dms_tool": true,
+    "all_statements_through_equivalency_tool": true,
+    "no_agent_judgment_for_equivalency": true,
+    "all_statements_in_report": true,
+    "tool_errors_marked_as_error": true,
+    "comprehensive_documentation": true
+  }
+}

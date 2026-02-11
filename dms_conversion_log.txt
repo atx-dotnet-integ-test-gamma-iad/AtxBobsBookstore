@@ -1,0 +1,188 @@
+================================================================================
+DMS CONVERSION LOG
+Microsoft SQL Server to PostgreSQL Migration
+================================================================================
+This file documents all DMS tool invocations, outputs, and any manual conversions
+applied when DMS tool failed to convert statements.
+================================================================================
+
+================================================================================
+STATEMENT 1 - STMT_001
+================================================================================
+Original SQL (MS SQL Server):
+------------------------------
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+DMS Tool Parameters:
+-------------------
+- schema_name: bobsbookstore_dbo
+- sql_text: [as above]
+
+DMS Tool Output:
+----------------
+{
+  "conversion_timestamp": "2026-02-11T19:04:25.582479",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-11T19:04:30.014477"
+}
+
+Manual Conversion Applied:
+--------------------------
+PostgreSQL Equivalent:
+-- PostgreSQL doesn't support DECLARE/EXEC for stored procedures in the same way
+-- Stored procedures in PostgreSQL are called as functions and return values directly
+-- This needs to be converted to a function call
+
+SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(
+    @BusinessEntityID::integer, 
+    @NationalIDNumber::varchar, 
+    @BirthDate::timestamp, 
+    @MaritalStatus::varchar, 
+    @Gender::varchar
+);
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Conversion Notes:
+- SQL Server EXEC with output parameter converted to PostgreSQL function call
+- Schema qualifier maintained: bobsbookstore_dbo
+- Function name converted to lowercase (PostgreSQL convention)
+- Parameters remain named parameters (@param style) - will work with NpgsqlParameter
+- Return value is directly from SELECT, not via @rowsAffected variable
+
+================================================================================
+STATEMENT 2 - STMT_002
+================================================================================
+Original SQL (MS SQL Server):
+------------------------------
+SELECT * FROM bobsbookstore_dbo.author;
+
+DMS Tool Parameters:
+-------------------
+- schema_name: bobsbookstore_dbo
+- sql_text: [as above]
+
+DMS Tool Output:
+----------------
+{
+  "conversion_timestamp": "2026-02-11T19:04:38.420392",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-11T19:04:42.508674"
+}
+
+Manual Conversion Applied:
+--------------------------
+PostgreSQL Equivalent:
+SELECT * FROM bobsbookstore_dbo.author;
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Conversion Notes:
+- This statement is already PostgreSQL compatible
+- No syntax changes required
+- Schema and table names remain unchanged
+- Simple SELECT * query works identically in both databases
+
+================================================================================
+STATEMENT 3 - STMT_003
+================================================================================
+Original SQL (MS SQL Server):
+------------------------------
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+DMS Tool Parameters:
+-------------------
+- schema_name: bobsbookstore_dbo
+- sql_text: [as above]
+
+DMS Tool Output:
+----------------
+{
+  "conversion_timestamp": "2026-02-11T19:04:50.588764",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-11T19:04:54.761272"
+}
+
+Manual Conversion Applied:
+--------------------------
+PostgreSQL Equivalent:
+SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID::integer);
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Conversion Notes:
+- SQL Server EXEC with output parameter converted to PostgreSQL function call
+- Schema qualifier maintained: bobsbookstore_dbo
+- Function name converted to lowercase (PostgreSQL convention)
+- Parameter remains named parameter (@BusinessEntityID) - will work with NpgsqlParameter
+- Return value is directly from SELECT, not via @rowsAffected variable
+- Removed [dbo] qualifier, using bobsbookstore_dbo instead
+
+================================================================================
+STATEMENT 4 - STMT_004
+================================================================================
+Original SQL (MS SQL Server):
+------------------------------
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+-------------------
+- schema_name: bobsbookstore_dbo
+- sql_text: [as above]
+
+DMS Tool Output:
+----------------
+{
+  "conversion_timestamp": "2026-02-11T19:05:03.652035",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-11T19:05:07.830950"
+}
+
+Manual Conversion Applied:
+--------------------------
+PostgreSQL Equivalent:
+SELECT 
+    BusinessEntityID, 
+    TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+    DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE DATE_PART('year', HireDate) = @HireDate;
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with PostgreSQL format patterns
+  * 'yyyy-MM-dd HH:mm:ss' → 'YYYY-MM-DD HH24:MI:SS'
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate))
+  * GETDATE() → CURRENT_TIMESTAMP
+  * DATEDIFF for year difference → DATE_PART with AGE function
+- DATEPART(YEAR, HireDate) converted to DATE_PART('year', HireDate)
+- Schema and table names remain unchanged: bobsbookstore_dbo.author
+- Parameter @HireDate remains unchanged (compatible with NpgsqlParameter)
+
+================================================================================
+SUMMARY
+================================================================================
+Total Statements Processed: 4
+DMS Tool Successful Conversions: 0
+DMS Tool Failed Conversions: 4
+Manual Conversions Applied: 4
+
+All statements encountered DMS tool metadata model creation errors.
+All statements have been manually converted to PostgreSQL syntax using best judgment.
+All manual conversions documented with full DMS tool output and conversion rationale.
+
+Key Conversion Patterns Applied:
+1. EXEC stored procedure → SELECT function_name() for PostgreSQL function calls
+2. FORMAT() → TO_CHAR() with appropriate format strings
+3. DATEDIFF() → DATE_PART() with AGE() function
+4. GETDATE() → CURRENT_TIMESTAMP
+5. DATEPART() → DATE_PART()
+6. Schema names preserved as bobsbookstore_dbo
+7. Parameter names preserved (@param) for compatibility with NpgsqlParameter
+
+================================================================================

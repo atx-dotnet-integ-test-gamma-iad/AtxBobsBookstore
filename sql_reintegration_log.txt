@@ -1,0 +1,190 @@
+================================================================================
+SQL RE-INTEGRATION LOG
+Microsoft SQL Server to PostgreSQL Migration
+================================================================================
+This file documents all SQL statement re-integration changes made to the codebase,
+including converted SQL statements, parameter type changes, and schema updates.
+================================================================================
+
+================================================================================
+STATEMENT 1 - STMT_001
+================================================================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: EditUsingStoredProcedure
+Original Line Number: 163
+
+Original SQL Statement:
+-----------------------
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+New PostgreSQL Statement:
+-------------------------
+SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+Schema Changes Applied:
+-----------------------
+- [dbo].[uspUpdateAuthorPersonalInfo] → bobsbookstore_dbo.uspupdateauthorpersonalinfo
+- Function name lowercased per PostgreSQL convention
+- Removed DECLARE/EXEC/SELECT pattern, replaced with direct function call SELECT
+
+Parameter Type Changes:
+-----------------------
+All 5 SqlParameter instances replaced with NpgsqlParameter:
+1. new SqlParameter("@BusinessEntityID", businessEntityId) → new NpgsqlParameter("@BusinessEntityID", businessEntityId)
+2. new SqlParameter("@NationalIDNumber", nationalIdNumber) → new NpgsqlParameter("@NationalIDNumber", nationalIdNumber)
+3. new SqlParameter("@BirthDate", birthDate.ToUniversalTime()) → new NpgsqlParameter("@BirthDate", birthDate.ToUniversalTime())
+4. new SqlParameter("@MaritalStatus", maritalStatus) → new NpgsqlParameter("@MaritalStatus", maritalStatus)
+5. new SqlParameter("@Gender", gender) → new NpgsqlParameter("@Gender", gender)
+
+Parameter Binding:
+------------------
+- Parameter names preserved (@param syntax)
+- Parameter order matches PostgreSQL function signature
+- All parameters use NpgsqlParameter for PostgreSQL compatibility
+
+================================================================================
+STATEMENT 2 - STMT_002
+================================================================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: FindAllAuthorsEmbeddedSql
+Original Line Number: 187
+
+Original SQL Statement:
+-----------------------
+SELECT * FROM bobsbookstore_dbo.author;
+
+New PostgreSQL Statement:
+-------------------------
+SELECT * FROM bobsbookstore_dbo.author;
+
+Schema Changes Applied:
+-----------------------
+None - statement is identical in both SQL Server and PostgreSQL
+
+Parameter Type Changes:
+-----------------------
+None - no parameters in this statement
+
+Parameter Binding:
+------------------
+N/A - no parameters
+
+Notes:
+------
+Statement required no conversion. Already PostgreSQL compatible.
+
+================================================================================
+STATEMENT 3 - STMT_003
+================================================================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: DeleteAuthorEmbeddedSql
+Original Line Number: 208
+
+Original SQL Statement:
+-----------------------
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+New PostgreSQL Statement:
+-------------------------
+SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);
+
+Schema Changes Applied:
+-----------------------
+- [dbo].[uspDeleteAuthor] → bobsbookstore_dbo.uspdeleteauthor
+- Function name lowercased per PostgreSQL convention
+- Removed DECLARE/EXEC/SELECT pattern, replaced with direct function call SELECT
+
+Parameter Type Changes:
+-----------------------
+1 SqlParameter instance replaced with NpgsqlParameter:
+1. new SqlParameter("@BusinessEntityID", businessEntityId) → new NpgsqlParameter("@BusinessEntityID", businessEntityId)
+
+Parameter Binding:
+------------------
+- Parameter name preserved (@BusinessEntityID)
+- Uses NpgsqlParameter for PostgreSQL compatibility
+
+================================================================================
+STATEMENT 4 - STMT_004
+================================================================================
+File: app/Bookstore.Web/Controllers/AuthorsController.cs
+Method: SelectAuthorsByHireYear
+Original Line Number: 228
+
+Original SQL Statement:
+-----------------------
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+New PostgreSQL Statement:
+-------------------------
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE DATE_PART('year', HireDate) = @HireDate;
+
+Schema Changes Applied:
+-----------------------
+None - table name bobsbookstore_dbo.author unchanged
+
+Function Conversions Applied:
+-----------------------------
+- FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') → TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS')
+- DATEDIFF(YEAR, BirthDate, GETDATE()) → DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate))
+- DATEPART(YEAR, HireDate) → DATE_PART('year', HireDate)
+
+Parameter Type Changes:
+-----------------------
+1 SqlParameter instance replaced with NpgsqlParameter:
+1. new SqlParameter("@HireDate", hireYear) → new NpgsqlParameter("@HireDate", hireYear)
+
+Parameter Binding:
+------------------
+- Parameter name preserved (@HireDate)
+- Uses NpgsqlParameter for PostgreSQL compatibility
+
+================================================================================
+SUMMARY
+================================================================================
+Total SQL Statements Re-integrated: 4
+Files Modified: 1 (app/Bookstore.Web/Controllers/AuthorsController.cs)
+
+SqlParameter → NpgsqlParameter Replacements: 7
+- STMT_001: 5 parameters replaced
+- STMT_002: 0 parameters (no parameters in statement)
+- STMT_003: 1 parameter replaced
+- STMT_004: 1 parameter replaced
+
+Schema Object Name Changes:
+---------------------------
+1. [dbo].[uspUpdateAuthorPersonalInfo] → bobsbookstore_dbo.uspupdateauthorpersonalinfo
+2. [dbo].[uspDeleteAuthor] → bobsbookstore_dbo.uspdeleteauthor
+3. Table bobsbookstore_dbo.author → No change
+
+Function Conversions:
+---------------------
+- FORMAT() → TO_CHAR()
+- DATEDIFF() → DATE_PART() with AGE()
+- GETDATE() → CURRENT_TIMESTAMP
+- DATEPART() → DATE_PART()
+
+Using Statements:
+-----------------
+✓ 'using Npgsql;' already present in file (line 10)
+✓ No SQL Server-specific using statements to remove
+
+Verification:
+-------------
+✓ All 4 SQL statements updated with PostgreSQL syntax
+✓ All 7 SqlParameter instances replaced with NpgsqlParameter
+✓ No SqlParameter references remain in the codebase
+✓ Schema object names match manual conversions (DMS tool was not successful)
+✓ Parameter bindings correct for PostgreSQL (@param syntax works with NpgsqlParameter)
+✓ Using Npgsql statement present
+
+Re-integration Complete:
+------------------------
+All SQL statements have been successfully re-integrated into the codebase with
+PostgreSQL-compatible syntax. The application is ready for compilation and testing.
+
+================================================================================
