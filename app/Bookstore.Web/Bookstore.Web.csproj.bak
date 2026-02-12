@@ -17,7 +17,7 @@
     <PackageReference Include="AWS.Logger.AspNetCore" Version="3.3.0" />
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.7.2.87" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="6.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.7" />
     <!-- Removed Microsoft.EntityFrameworkCore.SqlServer for PostgreSQL migration -->
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.6" />
