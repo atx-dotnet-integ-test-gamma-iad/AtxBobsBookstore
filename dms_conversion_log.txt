@@ -1,0 +1,141 @@
+================================================================
+DMS MCP Tool Conversion Log
+================================================================
+Timestamp: 2026-02-13T08:27:45
+Schema Name: bobsbookstore_dbo
+Total Statements Processed: 5
+================================================================
+
+================================================================
+STATEMENT 1: EditUsingStoredProcedure
+================================================================
+Input SQL (MS SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+DMS Tool Status: ERROR
+DMS Tool Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Tool Timestamp: 2026-02-13T08:27:48.112006
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool encountered metadata model creation error
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);
+
+Conversion Notes:
+- SQL Server stored procedures are converted to PostgreSQL functions
+- DECLARE and EXEC syntax removed (not needed for PostgreSQL function calls)
+- SQL Server named parameters (@param) converted to PostgreSQL positional parameters ($1, $2, etc.)
+- Return value handling changed from OUTPUT variable to SELECT statement
+- Schema prefix preserved (bobsbookstore_dbo)
+================================================================
+
+
+================================================================
+STATEMENT 2: FindAllAuthorsEmbeddedSql
+================================================================
+Input SQL (MS SQL Server):
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Status: ERROR
+DMS Tool Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Tool Timestamp: 2026-02-13T08:27:59.612340
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool encountered metadata model creation error
+
+Manual Conversion Applied:
+SELECT * FROM bobsbookstore_dbo.author
+
+Conversion Notes:
+- This statement is already PostgreSQL-compatible
+- No changes required as basic SELECT with schema qualification works in both SQL Server and PostgreSQL
+- Schema name bobsbookstore_dbo preserved as-is
+================================================================
+
+
+================================================================
+STATEMENT 3: DeleteAuthorEmbeddedSql
+================================================================
+Input SQL (MS SQL Server):
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Status: ERROR
+DMS Tool Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Tool Timestamp: 2026-02-13T08:28:11.395565
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool encountered metadata model creation error
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspDeleteAuthor($1);
+
+Conversion Notes:
+- SQL Server stored procedure converted to PostgreSQL function
+- DECLARE and EXEC syntax removed
+- SQL Server named parameter (@BusinessEntityID) converted to PostgreSQL positional parameter ($1)
+- Return value handling changed from OUTPUT variable to SELECT statement
+- Schema prefix changed from [dbo] to bobsbookstore_dbo for consistency
+================================================================
+
+
+================================================================
+STATEMENT 4: SelectAuthorsByHireYear
+================================================================
+Input SQL (MS SQL Server):
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Status: ERROR
+DMS Tool Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Tool Timestamp: 2026-02-13T08:28:22.249538
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool encountered metadata model creation error
+
+Manual Conversion Applied:
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('YEAR', AGE(CURRENT_DATE, BirthDate)) AS Age FROM Author WHERE EXTRACT(YEAR FROM HireDate) = $1;
+
+Conversion Notes:
+- FORMAT() converted to TO_CHAR() with adjusted format string (YYYY-MM-DD HH24:MI:SS)
+- DATEDIFF(YEAR, BirthDate, GETDATE()) converted to DATE_PART('YEAR', AGE(CURRENT_DATE, BirthDate))
+- GETDATE() converted to CURRENT_DATE
+- DATEPART(YEAR, HireDate) converted to EXTRACT(YEAR FROM HireDate)
+- Named parameter @HireDate converted to positional parameter $1
+================================================================
+
+
+================================================================
+STATEMENT 5: FindAllProducts
+================================================================
+Input SQL (MS SQL Server):
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Status: ERROR
+DMS Tool Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Tool Timestamp: 2026-02-13T08:28:32.571658
+
+Conversion Method: MANUAL_AFTER_DMS_FAILURE
+Reason: DMS tool encountered metadata model creation error
+
+Manual Conversion Applied:
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Conversion Notes:
+- SQL Server stored procedure EXEC converted to PostgreSQL function SELECT statement
+- Schema prefix changed from [dbo] to bobsbookstore_dbo for consistency
+- PostgreSQL requires function call syntax with parentheses even when no parameters
+================================================================
+
+
+================================================================
+SUMMARY
+================================================================
+Total Statements: 5
+DMS Tool Successes: 0
+DMS Tool Failures: 5
+Manual Conversions: 5
+
+All statements failed DMS conversion due to metadata model creation errors.
+All conversions were performed manually following SQL Server to PostgreSQL
+migration best practices.
+================================================================
