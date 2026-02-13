@@ -1,0 +1,147 @@
+-- ============================================================================
+-- DMS CONVERSION LOG
+-- Microsoft SQL Server to PostgreSQL Migration
+-- Conversion Method: Manual (after DMS tool failures)
+-- Conversion Date: 2025-02-12
+-- ============================================================================
+
+-- DMS Tool Status: All conversions failed due to metadata model creation error
+-- Error Message: "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+-- Fallback Strategy: Manual conversion using PostgreSQL equivalents
+
+-- ============================================================================
+-- STATEMENT #1: Simple SELECT from Author Table
+-- ============================================================================
+
+-- ORIGINAL SQL SERVER STATEMENT:
+SELECT * FROM bobsbookstore_dbo.author
+
+-- DMS TOOL OUTPUT:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+-- Error Timestamp: 2026-02-12T23:58:19.903144
+
+-- MANUAL POSTGRESQL CONVERSION:
+SELECT * FROM bobsbookstore_dbo.author
+
+-- CONVERSION NOTES:
+-- - This statement is already PostgreSQL compatible
+-- - Schema qualification (bobsbookstore_dbo.author) works in PostgreSQL
+-- - No SQL Server-specific syntax to convert
+-- - Direct reuse possible
+
+-- ============================================================================
+-- STATEMENT #2: Stored Procedure Call - Update Author Personal Info
+-- ============================================================================
+
+-- ORIGINAL SQL SERVER STATEMENT:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+-- DMS TOOL OUTPUT:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+-- Error Timestamp: 2026-02-12T23:58:32.524559
+
+-- MANUAL POSTGRESQL CONVERSION:
+-- Option 1: Call stored procedure (if exists in PostgreSQL)
+-- CALL bobsbookstore_dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);
+
+-- Option 2: Direct SQL UPDATE (recommended for ADO.NET compatibility)
+UPDATE bobsbookstore_dbo.author 
+SET NationalIDNumber = $2, 
+    BirthDate = $3, 
+    MaritalStatus = $4, 
+    Gender = $5, 
+    ModifiedDate = CURRENT_TIMESTAMP 
+WHERE BusinessEntityID = $1
+
+-- CONVERSION NOTES:
+-- - SQL Server DECLARE/EXEC pattern doesn't translate directly to PostgreSQL
+-- - PostgreSQL uses CALL for procedures or SELECT for functions
+-- - For ADO.NET ExecuteSqlRawAsync, direct UPDATE is more reliable
+-- - Parameters use $1, $2, etc. syntax in PostgreSQL (will be replaced by NpgsqlParameter)
+-- - CURRENT_TIMESTAMP is PostgreSQL equivalent of GETDATE()
+-- - Removed @rowsAffected pattern; ExecuteSqlRawAsync returns affected rows directly
+-- - Schema [dbo] maps to bobsbookstore_dbo schema
+
+-- ============================================================================
+-- STATEMENT #3: Stored Procedure Call - Delete Author
+-- ============================================================================
+
+-- ORIGINAL SQL SERVER STATEMENT:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+-- DMS TOOL OUTPUT:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+-- Error Timestamp: 2026-02-12T23:58:43.189600
+
+-- MANUAL POSTGRESQL CONVERSION:
+-- Option 1: Call stored procedure (if exists in PostgreSQL)
+-- CALL bobsbookstore_dbo.uspDeleteAuthor($1);
+
+-- Option 2: Direct SQL DELETE (recommended for ADO.NET compatibility)
+DELETE FROM bobsbookstore_dbo.author WHERE BusinessEntityID = $1
+
+-- CONVERSION NOTES:
+-- - SQL Server DECLARE/EXEC pattern doesn't translate directly
+-- - For ADO.NET ExecuteSqlRawAsync, direct DELETE is more reliable
+-- - Parameter uses $1 syntax (will be replaced by NpgsqlParameter)
+-- - Removed @rowsAffected pattern; ExecuteSqlRawAsync returns affected rows directly
+-- - Schema [dbo] maps to bobsbookstore_dbo schema
+
+-- ============================================================================
+-- STATEMENT #4: Complex SELECT with SQL Server Date Functions
+-- ============================================================================
+
+-- ORIGINAL SQL SERVER STATEMENT:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+-- DMS TOOL OUTPUT:
+-- Status: error
+-- Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+-- Error Timestamp: 2026-02-12T23:58:54.163039
+
+-- MANUAL POSTGRESQL CONVERSION:
+SELECT BusinessEntityID, 
+       TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, 
+       EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age 
+FROM bobsbookstore_dbo.author 
+WHERE EXTRACT(YEAR FROM HireDate) = $1;
+
+-- CONVERSION NOTES:
+-- SQL Server to PostgreSQL function mappings:
+-- - FORMAT(date, 'yyyy-MM-dd HH:mm:ss') -> TO_CHAR(date, 'YYYY-MM-DD HH24:MI:SS')
+--   * PostgreSQL uses uppercase for format patterns
+--   * HH24 is 24-hour format (HH is 12-hour)
+--   * MI is minutes (not mm)
+--   * SS is seconds
+-- - DATEDIFF(YEAR, date1, date2) -> EXTRACT(YEAR FROM AGE(date2, date1))
+--   * AGE() calculates interval between dates
+--   * EXTRACT(YEAR FROM interval) gets years component
+-- - GETDATE() -> CURRENT_DATE or NOW()
+--   * CURRENT_DATE returns date only
+--   * NOW() or CURRENT_TIMESTAMP returns timestamp with time
+-- - DATEPART(YEAR, date) -> EXTRACT(YEAR FROM date)
+--   * Direct extraction using EXTRACT
+-- - @HireDate parameter -> $1 (replaced by NpgsqlParameter)
+-- - Schema bobsbookstore_dbo remains unchanged
+
+-- ============================================================================
+-- CONVERSION SUMMARY
+-- ============================================================================
+-- Total Statements: 4
+-- DMS Tool Attempts: 4 (all failed)
+-- Manual Conversions: 4
+-- 
+-- Key Conversion Patterns Applied:
+-- 1. Stored procedure calls -> Direct SQL statements (UPDATE/DELETE)
+-- 2. FORMAT() -> TO_CHAR()
+-- 3. DATEDIFF() -> EXTRACT(YEAR FROM AGE())
+-- 4. GETDATE() -> CURRENT_DATE/NOW()
+-- 5. DATEPART() -> EXTRACT()
+-- 6. @parameter -> $N notation
+-- 7. [dbo] schema -> bobsbookstore_dbo schema
+-- 
+-- Next Step: Validate equivalency using SQL Equivalency tool
+-- ============================================================================

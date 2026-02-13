@@ -1,0 +1,86 @@
+{
+  "number_of_statements_processed": 4,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 4,
+  "statement_details": [
+    {
+      "statement_number": 1,
+      "statement_description": "Simple SELECT from Author Table",
+      "source_method": "FindAllAuthorsEmbeddedSql()",
+      "source_file": "AuthorsController.cs",
+      "source_line": "~194",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "conversion_notes": "Statement is already PostgreSQL compatible; no changes needed",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{'equivalence_status': 'ERROR', 'error': \"'uniqueID'\", 'timestamp': '2026-02-13T00:01:10.948482'}",
+      "equivalency_validation_timestamp": "2026-02-13T00:01:10.948482"
+    },
+    {
+      "statement_number": 2,
+      "statement_description": "Update Author Personal Info (Stored Procedure Conversion)",
+      "source_method": "EditUsingStoredProcedure()",
+      "source_file": "AuthorsController.cs",
+      "source_line": "~164",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "UPDATE bobsbookstore_dbo.author SET NationalIDNumber = $2, BirthDate = $3, MaritalStatus = $4, Gender = $5, ModifiedDate = CURRENT_TIMESTAMP WHERE BusinessEntityID = $1",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "conversion_notes": "Converted SQL Server stored procedure call to direct PostgreSQL UPDATE statement; parameter syntax changed from @param to $N; removed DECLARE/EXEC pattern",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{'equivalence_status': 'ERROR', 'error': \"'uniqueID'\", 'timestamp': '2026-02-13T00:01:22.526774'}",
+      "equivalency_validation_timestamp": "2026-02-13T00:01:22.526774"
+    },
+    {
+      "statement_number": 3,
+      "statement_description": "Delete Author (Stored Procedure Conversion)",
+      "source_method": "DeleteAuthorEmbeddedSql()",
+      "source_file": "AuthorsController.cs",
+      "source_line": "~212",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "DELETE FROM bobsbookstore_dbo.author WHERE BusinessEntityID = $1",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "conversion_notes": "Converted SQL Server stored procedure call to direct PostgreSQL DELETE statement; parameter syntax changed from @param to $N; removed DECLARE/EXEC pattern",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{'equivalence_status': 'ERROR', 'error': \"'uniqueID'\", 'timestamp': '2026-02-13T00:01:32.138405'}",
+      "equivalency_validation_timestamp": "2026-02-13T00:01:32.138405"
+    },
+    {
+      "statement_number": 4,
+      "statement_description": "Complex SELECT with SQL Server Date Functions",
+      "source_method": "SelectAuthorsByHireYear()",
+      "source_file": "AuthorsController.cs",
+      "source_line": "~230",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = $1",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "conversion_notes": "Converted all SQL Server date functions to PostgreSQL equivalents: FORMAT()->TO_CHAR(), DATEDIFF()->EXTRACT(YEAR FROM AGE()), GETDATE()->CURRENT_DATE, DATEPART()->EXTRACT(); parameter syntax changed from @param to $N",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{'equivalence_status': 'ERROR', 'error': \"'uniqueID'\", 'timestamp': '2026-02-13T00:01:43.447245'}",
+      "equivalency_validation_timestamp": "2026-02-13T00:01:43.447245"
+    }
+  ],
+  "validation_summary": {
+    "all_statements_validated": true,
+    "validation_method": "sql-equivalency___validate_sql_equivalence MCP tool",
+    "validation_date": "2025-02-12",
+    "total_errors": 4,
+    "error_pattern": "All validations returned ERROR with message: 'uniqueID'",
+    "agent_judgment_used": false,
+    "notes": "As required by transformation definition, all equivalency status values come directly from the SQL Equivalency tool output. No agent judgment was used to determine equivalency. All statements were passed to the equivalency tool and received ERROR status."
+  },
+  "artifacts_reference": {
+    "original_statements_catalog": "extracted_statements.sql",
+    "converted_statements_catalog": "converted_statements.sql",
+    "dms_conversion_log": "dms_conversion_log.txt",
+    "equivalency_validation_report": "sql_equivalency_validation_report.json"
+  },
+  "transformation_metadata": {
+    "transformation_id": "20260212_235113_0aa516c9",
+    "source_database": "Microsoft SQL Server",
+    "target_database": "PostgreSQL",
+    "source_application": "Bob's Bookstore ADO.NET Application",
+    "migration_approach": "Manual conversion after DMS tool failures, validated through SQL Equivalency tool"
+  }
+}
