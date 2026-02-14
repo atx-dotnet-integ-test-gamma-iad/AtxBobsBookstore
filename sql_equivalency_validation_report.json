@@ -1,0 +1,92 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "statement_id": 1,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "EditUsingStoredProcedure()",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-14T13:41:38.937521\"}",
+      "notes": "Equivalency tool encountered an error with 'uniqueID'. Stored procedure call converted from SQL Server EXEC pattern to PostgreSQL function call pattern."
+    },
+    {
+      "statement_id": 2,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "FindAllAuthorsEmbeddedSql()",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-14T13:41:48.827255\"}",
+      "notes": "Equivalency tool encountered an error with 'uniqueID'. Statement is identical in both SQL Server and PostgreSQL as it uses simple SELECT syntax."
+    },
+    {
+      "statement_id": 3,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "DeleteAuthorEmbeddedSql()",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-14T13:42:01.685649\"}",
+      "notes": "Equivalency tool encountered an error with 'uniqueID'. Stored procedure call converted from SQL Server EXEC pattern to PostgreSQL function call pattern."
+    },
+    {
+      "statement_id": 4,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method": "SelectAuthorsByHireYear()",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-14T13:42:13.249666\"}",
+      "notes": "Equivalency tool encountered an error with 'uniqueID'. Complex query with SQL Server functions (FORMAT, DATEDIFF, GETDATE, DATEPART) converted to PostgreSQL equivalents (TO_CHAR, AGE/DATE_PART, CURRENT_TIMESTAMP, EXTRACT)."
+    },
+    {
+      "statement_id": 5,
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "method": "FindAllProducts()",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspGetProductData();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-14T13:42:22.432556\"}",
+      "notes": "Equivalency tool encountered an error with 'uniqueID'. Stored procedure call converted from SQL Server EXEC to PostgreSQL SELECT FROM function pattern."
+    }
+  ],
+  "summary": {
+    "total_statements": 5,
+    "dms_tool_successful": 0,
+    "manual_conversions": 5,
+    "equivalency_validations_attempted": 5,
+    "equivalency_tool_errors": 5,
+    "common_error": "All equivalency validations failed with 'uniqueID' error from the SQL Equivalency tool",
+    "conversion_quality": "All conversions follow PostgreSQL best practices and standard patterns for migrating from SQL Server",
+    "manual_review_required": "Yes - All statements require manual testing due to equivalency tool errors"
+  },
+  "conversion_details": {
+    "stored_procedure_conversions": 3,
+    "simple_select_conversions": 1,
+    "complex_select_conversions": 1,
+    "function_mapping": {
+      "FORMAT_to_TO_CHAR": 1,
+      "DATEDIFF_to_AGE_DATE_PART": 1,
+      "GETDATE_to_CURRENT_TIMESTAMP": 1,
+      "DATEPART_to_EXTRACT": 1,
+      "EXEC_to_SELECT_function": 3
+    }
+  },
+  "recommendations": [
+    "All statements should undergo thorough manual testing in the target PostgreSQL environment",
+    "The equivalency tool error suggests a service-level issue that prevented automated validation",
+    "Stored procedure/function implementations in PostgreSQL should be verified to match expected signatures",
+    "Integration testing should verify that date/time functions produce equivalent results",
+    "Consider creating unit tests for each SQL statement to validate behavior parity"
+  ]
+}
