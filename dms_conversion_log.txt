@@ -1,0 +1,178 @@
+================================================================================
+DMS MCP TOOL CONVERSION LOG
+Migration Project: BobsBookstore SQL Server to PostgreSQL
+Timestamp: 2026-02-14T20:17:25
+================================================================================
+
+================================================================================
+STATEMENT 1: Update Author Personal Info Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- schema_name: bobsbookstore_dbo
+- migration_project_identifier: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+- database_name: BobsBookstore
+- server_name: 172.31.93.178
+- region: us-east-1
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-02-14T20:17:25.314154",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-14T20:17:29.683583"
+}
+
+Conversion Status: MANUAL_AFTER_DMS_FAILURE
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+Manual Conversion Rationale:
+- DMS tool failed with metadata model error
+- Converted DECLARE/EXEC pattern to PostgreSQL SELECT function call
+- Removed DECLARE statement (not needed in execution context)
+- Changed [dbo].[procname] to schema.procname format
+
+================================================================================
+STATEMENT 2: Select All Authors
+================================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Parameters:
+- schema_name: bobsbookstore_dbo
+- migration_project_identifier: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+- database_name: BobsBookstore
+- server_name: 172.31.93.178
+- region: us-east-1
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-02-14T20:17:30.425026",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-14T20:17:34.468647"
+}
+
+Conversion Status: MANUAL_AFTER_DMS_FAILURE
+
+Manual Conversion Applied:
+SELECT * FROM bobsbookstore_dbo.author
+
+Manual Conversion Rationale:
+- DMS tool failed with metadata model error
+- Original statement is already PostgreSQL compatible
+- No syntax changes required
+
+================================================================================
+STATEMENT 3: Delete Author Using Stored Procedure
+================================================================================
+Original SQL:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Parameters:
+- schema_name: bobsbookstore_dbo
+- migration_project_identifier: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+- database_name: BobsBookstore
+- server_name: 172.31.93.178
+- region: us-east-1
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-02-14T20:17:35.218237",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-14T20:17:39.201200"
+}
+
+Conversion Status: MANUAL_AFTER_DMS_FAILURE
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);
+
+Manual Conversion Rationale:
+- DMS tool failed with metadata model error
+- Converted DECLARE/EXEC pattern to PostgreSQL SELECT function call
+- Removed DECLARE and SELECT @rowsAffected (return value handled by function)
+- Changed [dbo].[procname] to schema.procname format
+
+================================================================================
+STATEMENT 4: Select Authors By Hire Year with Calculated Fields
+================================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Parameters:
+- schema_name: bobsbookstore_dbo
+- migration_project_identifier: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+- database_name: BobsBookstore
+- server_name: 172.31.93.178
+- region: us-east-1
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-02-14T20:17:39.941040",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-14T20:17:43.976545"
+}
+
+Conversion Status: MANUAL_AFTER_DMS_FAILURE
+
+Manual Conversion Applied:
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Manual Conversion Rationale:
+- DMS tool failed with metadata model error
+- Converted SQL Server specific functions to PostgreSQL equivalents:
+  * FORMAT() -> TO_CHAR() with PostgreSQL date format patterns
+  * DATEDIFF(YEAR, date1, date2) -> DATE_PART('year', AGE(date2, date1))
+  * GETDATE() -> CURRENT_TIMESTAMP
+  * DATEPART(YEAR, date) -> EXTRACT(YEAR FROM date)
+
+================================================================================
+STATEMENT 5: Get Product Data Using Stored Procedure
+================================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Tool Parameters:
+- schema_name: bobsbookstore_dbo
+- migration_project_identifier: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+- database_name: BobsBookstore
+- server_name: 172.31.93.178
+- region: us-east-1
+
+DMS Tool Response:
+{
+  "conversion_timestamp": "2026-02-14T20:17:44.727215",
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "error_timestamp": "2026-02-14T20:17:48.593644"
+}
+
+Conversion Status: MANUAL_AFTER_DMS_FAILURE
+
+Manual Conversion Applied:
+SELECT * FROM bobsbookstore_dbo.uspGetProductData();
+
+Manual Conversion Rationale:
+- DMS tool failed with metadata model error
+- Converted EXEC to SELECT * FROM for stored procedure call
+- PostgreSQL requires SELECT * FROM for procedures that return result sets
+- Changed [dbo].[procname] to schema.procname() format with parentheses
+
+================================================================================
+SUMMARY
+================================================================================
+Total Statements Processed: 5
+DMS Tool Successful Conversions: 0
+Manual Conversions After DMS Failure: 5
+All conversions completed using manual fallback due to DMS tool errors.
+
+================================================================================
+END OF LOG
+================================================================================

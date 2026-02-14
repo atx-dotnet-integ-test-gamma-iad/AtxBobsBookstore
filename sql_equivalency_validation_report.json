@@ -1,0 +1,106 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "statement_id": 1,
+      "statement_name": "Update Author Personal Info Using Stored Procedure",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "EditUsingStoredProcedure",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-14T20:20:15.721716"
+      },
+      "notes": "SQL Equivalency tool returned ERROR. DMS tool conversion failed with metadata model error. Manual conversion was applied."
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "Select All Authors",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-14T20:20:35.793118"
+      },
+      "notes": "SQL Equivalency tool returned ERROR. DMS tool conversion failed with metadata model error. Statement already PostgreSQL compatible - no syntax changes needed."
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "Delete Author Using Stored Procedure",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-14T20:20:36.854825"
+      },
+      "notes": "SQL Equivalency tool returned ERROR. DMS tool conversion failed with metadata model error. Manual conversion was applied."
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "Select Authors By Hire Year with Calculated Fields",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "method_name": "SelectAuthorsByHireYear",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-14T20:20:37.909356"
+      },
+      "notes": "SQL Equivalency tool returned ERROR. DMS tool conversion failed with metadata model error. Manual conversion applied with SQL Server function replacements: FORMAT->TO_CHAR, DATEDIFF->DATE_PART/AGE, GETDATE->CURRENT_TIMESTAMP, DATEPART->EXTRACT."
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "Get Product Data Using Stored Procedure",
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "method_name": "FindAllProducts",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspGetProductData();",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-14T20:20:38.956201"
+      },
+      "notes": "SQL Equivalency tool returned ERROR. DMS tool conversion failed with metadata model error. Manual conversion was applied."
+    }
+  ],
+  "summary": {
+    "dms_conversion_status": "All 5 statements failed DMS conversion with 'Metadata model creation failed' error",
+    "equivalency_validation_status": "All 5 statement pairs returned ERROR from SQL Equivalency tool with 'uniqueID' error",
+    "manual_intervention_required": true,
+    "agent_judgment_used_for_equivalency": false,
+    "all_statements_processed_through_dms": true,
+    "all_statement_pairs_validated_through_equivalency_tool": true
+  },
+  "important_notes": [
+    "NO AGENT JUDGMENT was used to determine SQL equivalency - all statuses come directly from the SQL Equivalency tool",
+    "ALL 5 SQL statements were processed through the DMS MCP tool as required (all failed)",
+    "ALL 5 statement pairs were validated through the SQL Equivalency MCP tool as required (all returned ERROR)",
+    "Manual conversions were applied after DMS tool failures, following PostgreSQL best practices",
+    "Equivalency validation errors may be due to tool issues, not statement correctness",
+    "All conversions follow standard SQL Server to PostgreSQL migration patterns"
+  ],
+  "generation_timestamp": "2026-02-14T20:20:39",
+  "report_version": "1.0"
+}
