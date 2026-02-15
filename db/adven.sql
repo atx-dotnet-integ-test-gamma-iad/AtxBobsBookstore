@@ -929,56 +929,57 @@ BEGIN
 END;
 GO
       
-CREATE PROCEDURE [dbo].[uspUpdateAuthorPersonalInfo]
-    @BusinessEntityID [int], 
-    @NationalIDNumber [nvarchar](15), 
-    @BirthDate [datetime], 
-    @MaritalStatus [nchar](1), 
-    @Gender [nchar](1)
-WITH EXECUTE AS CALLER
-AS
+CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(
+    p_BusinessEntityID INTEGER, 
+    p_NationalIDNumber VARCHAR(15), 
+    p_BirthDate TIMESTAMP, 
+    p_MaritalStatus CHAR(1), 
+    p_Gender CHAR(1)
+) RETURNS INTEGER AS $
+DECLARE
+    v_rows_affected INTEGER;
 BEGIN
-    SET NOCOUNT ON;
-
-    BEGIN TRY
-        UPDATE [dbo].[Author] 
-        SET [NationalIDNumber] = @NationalIDNumber 
-            ,[BirthDate] = @BirthDate 
-            ,[MaritalStatus] = @MaritalStatus 
-            ,[Gender] = @Gender 
-        WHERE [BusinessEntityID] = @BusinessEntityID;
-    END TRY
-    BEGIN CATCH
-        EXECUTE [dbo].[uspLogError];
-    END CATCH;
+    UPDATE bobsbookstore_dbo.author 
+    SET nationalnidnumber = p_NationalIDNumber,
+        birthdate = p_BirthDate,
+        maritalstatus = p_MaritalStatus,
+        gender = p_Gender
+    WHERE businessentityid = p_BusinessEntityID;
+    
+    GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
+    RETURN v_rows_affected;
+EXCEPTION
+    WHEN OTHERS THEN
+        PERFORM bobsbookstore_dbo.uspLogError();
+        RAISE;
 END;
-GO
+$ LANGUAGE plpgsql;
 
-CREATE PROCEDURE [dbo].[uspDeleteAuthor]
-    @BusinessEntityID [int]
-WITH EXECUTE AS CALLER
-AS
+
+CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspDeleteAuthor(
+    p_BusinessEntityID INTEGER
+) RETURNS INTEGER AS $
+DECLARE
+    v_rows_affected INTEGER;
 BEGIN
-    SET NOCOUNT ON;
-
-    BEGIN TRY
-        DELETE FROM [dbo].[Author]
-        WHERE [BusinessEntityID] = @BusinessEntityID;
-
-        -- Check if the delete was successful
-        IF @@ROWCOUNT = 0
-        BEGIN
-            RAISERROR('No author found with the provided BusinessEntityID.', 16, 1);
-            RETURN;
-        END
-    END TRY
-    BEGIN CATCH
+    DELETE FROM bobsbookstore_dbo.author
+    WHERE businessentityid = p_BusinessEntityID;
+    
+    GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
+    
+    -- Check if the delete was successful
+    IF v_rows_affected = 0 THEN
+        RAISE EXCEPTION 'No author found with the provided BusinessEntityID.';
+    END IF;
+    
+    RETURN v_rows_affected;
+EXCEPTION
+    WHEN OTHERS THEN
         -- Log the error and re-throw
-        EXECUTE [dbo].[uspLogError];
-        THROW;
-    END CATCH;
+        PERFORM bobsbookstore_dbo.uspLogError();
+        RAISE;
 END;
-GO
+$ LANGUAGE plpgsql;
 
 CREATE PROCEDURE [dbo].[uspGetProductData]
     @my_cursor CURSOR VARYING OUTPUT

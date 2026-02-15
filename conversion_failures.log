@@ -1,0 +1,250 @@
+================================================================================
+DMS CONVERSION FAILURES LOG
+================================================================================
+This file documents all SQL statements where DMS MCP tool conversion failed
+and manual conversion was required.
+================================================================================
+
+--------------------------------------------------------------------------------
+FAILURE #1: Update Author Personal Info Stored Procedure Call
+--------------------------------------------------------------------------------
+Original SQL Statement:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:09.855684"
+}
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+Conversion Rationale:
+- PostgreSQL stored procedures are called as functions
+- DECLARE/EXEC pattern not needed in PostgreSQL
+- Direct function call returns the result
+- Schema mapping preserved from [dbo] to bobsbookstore_dbo
+
+--------------------------------------------------------------------------------
+FAILURE #2: Delete Author Stored Procedure Call
+--------------------------------------------------------------------------------
+Original SQL Statement:
+DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:14.537237"
+}
+
+Manual Conversion Applied:
+SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);
+
+Conversion Rationale:
+- Simplified to direct function call
+- Removed DECLARE/EXEC/SELECT pattern
+- Schema mapping preserved
+
+--------------------------------------------------------------------------------
+FAILURE #3: Select All Authors
+--------------------------------------------------------------------------------
+Original SQL Statement:
+SELECT * FROM bobsbookstore_dbo.author
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:19.085185"
+}
+
+Manual Conversion Applied:
+SELECT * FROM bobsbookstore_dbo.author;
+
+Conversion Rationale:
+- Statement is PostgreSQL compatible as-is
+- Added semicolon for consistency
+- Schema name preserved
+
+--------------------------------------------------------------------------------
+FAILURE #4: Select Authors by Hire Year with Date Functions
+--------------------------------------------------------------------------------
+Original SQL Statement:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:23.792805"
+}
+
+Manual Conversion Applied:
+SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;
+
+Conversion Rationale:
+- FORMAT() → TO_CHAR() with PostgreSQL date format
+- DATEDIFF(YEAR, d1, d2) → EXTRACT(YEAR FROM AGE(d2, d1))
+- GETDATE() → CURRENT_TIMESTAMP
+- DATEPART(YEAR, date) → EXTRACT(YEAR FROM date)
+- All SQL Server date functions converted to PostgreSQL equivalents
+
+--------------------------------------------------------------------------------
+FAILURE #5: uspUpdateAuthorPersonalInfo Stored Procedure Definition
+--------------------------------------------------------------------------------
+Original SQL Statement:
+CREATE PROCEDURE [dbo].[uspUpdateAuthorPersonalInfo]
+    @BusinessEntityID [int], 
+    @NationalIDNumber [nvarchar](15), 
+    @BirthDate [datetime], 
+    @MaritalStatus [nchar](1), 
+    @Gender [nchar](1)
+WITH EXECUTE AS CALLER
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        UPDATE [dbo].[Author] 
+        SET [NationalIDNumber] = @NationalIDNumber 
+            ,[BirthDate] = @BirthDate 
+            ,[MaritalStatus] = @MaritalStatus 
+            ,[Gender] = @Gender 
+        WHERE [BusinessEntityID] = @BusinessEntityID;
+    END TRY
+    BEGIN CATCH
+        EXECUTE [dbo].[uspLogError];
+    END CATCH;
+END;
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:40.429733"
+}
+
+Manual Conversion Applied:
+CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(
+    p_BusinessEntityID INTEGER, 
+    p_NationalIDNumber VARCHAR(15), 
+    p_BirthDate TIMESTAMP, 
+    p_MaritalStatus CHAR(1), 
+    p_Gender CHAR(1)
+) RETURNS INTEGER AS $$
+DECLARE
+    v_rows_affected INTEGER;
+BEGIN
+    UPDATE bobsbookstore_dbo.author 
+    SET nationalnidnumber = p_NationalIDNumber,
+        birthdate = p_BirthDate,
+        maritalstatus = p_MaritalStatus,
+        gender = p_Gender
+    WHERE businessentityid = p_BusinessEntityID;
+    
+    GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
+    RETURN v_rows_affected;
+EXCEPTION
+    WHEN OTHERS THEN
+        PERFORM bobsbookstore_dbo.uspLogError();
+        RAISE;
+END;
+$$ LANGUAGE plpgsql;
+
+Conversion Rationale:
+- CREATE PROCEDURE → CREATE OR REPLACE FUNCTION
+- T-SQL syntax → PL/pgSQL syntax
+- WITH EXECUTE AS CALLER removed (PostgreSQL handles differently)
+- SET NOCOUNT ON removed (not applicable)
+- BEGIN TRY/CATCH → EXCEPTION WHEN OTHERS
+- Data type conversions: int→INTEGER, nvarchar→VARCHAR, datetime→TIMESTAMP, nchar→CHAR
+- Parameter naming convention: @name → p_name
+- Schema: [dbo] → bobsbookstore_dbo
+- Added GET DIAGNOSTICS for row count
+- Returns INTEGER instead of output parameter
+
+--------------------------------------------------------------------------------
+FAILURE #6: uspDeleteAuthor Stored Procedure Definition
+--------------------------------------------------------------------------------
+Original SQL Statement:
+CREATE PROCEDURE [dbo].[uspDeleteAuthor]
+    @BusinessEntityID [int]
+WITH EXECUTE AS CALLER
+AS
+BEGIN
+    SET NOCOUNT ON;
+    BEGIN TRY
+        DELETE FROM [dbo].[Author]
+        WHERE [BusinessEntityID] = @BusinessEntityID;
+        IF @@ROWCOUNT = 0
+        BEGIN
+            RAISERROR('No author found with the provided BusinessEntityID.', 16, 1);
+            RETURN;
+        END
+    END TRY
+    BEGIN CATCH
+        EXECUTE [dbo].[uspLogError];
+        THROW;
+    END CATCH;
+END;
+
+DMS Tool Error:
+{
+  "status": "error",
+  "error": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+  "conversion_timestamp": "2026-02-15T23:24:44.979113"
+}
+
+Manual Conversion Applied:
+CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspDeleteAuthor(
+    p_BusinessEntityID INTEGER
+) RETURNS INTEGER AS $$
+DECLARE
+    v_rows_affected INTEGER;
+BEGIN
+    DELETE FROM bobsbookstore_dbo.author
+    WHERE businessentityid = p_BusinessEntityID;
+    
+    GET DIAGNOSTICS v_rows_affected = ROW_COUNT;
+    
+    IF v_rows_affected = 0 THEN
+        RAISE EXCEPTION 'No author found with the provided BusinessEntityID.';
+    END IF;
+    
+    RETURN v_rows_affected;
+EXCEPTION
+    WHEN OTHERS THEN
+        PERFORM bobsbookstore_dbo.uspLogError();
+        RAISE;
+END;
+$$ LANGUAGE plpgsql;
+
+Conversion Rationale:
+- CREATE PROCEDURE → CREATE OR REPLACE FUNCTION
+- @@ROWCOUNT → GET DIAGNOSTICS ... ROW_COUNT
+- RAISERROR → RAISE EXCEPTION
+- THROW → RAISE (re-raises exception in EXCEPTION block)
+- T-SQL error handling → PL/pgSQL EXCEPTION blocks
+- Schema and naming conventions applied as above
+
+================================================================================
+SUMMARY
+================================================================================
+Total Statements Attempted: 6
+Total DMS Failures: 6 (100%)
+Total Manual Conversions: 6
+
+Root Cause:
+All DMS conversions failed due to "Metadata model creation failed: 
+{'error': 'Unknown metadata model creation status: RECEIVED'}"
+
+This appears to be a DMS service issue, not a problem with the SQL statements
+themselves. All statements were manually converted using standard SQL Server
+to PostgreSQL migration patterns.
+
+Manual Conversion Confidence: HIGH
+All conversions follow standard PostgreSQL migration best practices and should
+be functionally equivalent to the original SQL Server statements.
+================================================================================

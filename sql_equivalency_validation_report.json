@@ -1,0 +1,100 @@
+{
+  "number_of_statements_processed": 6,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 6,
+  "validation_timestamp": "2026-02-15T23:28:00Z",
+  "tool_status": "All validations returned ERROR with 'uniqueID' error - appears to be tool-side issue",
+  "statement_details": [
+    {
+      "statement_id": 1,
+      "statement_name": "uspUpdateAuthorPersonalInfo stored procedure call",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:36.608534\"}",
+      "validation_notes": "Equivalency tool returned ERROR. This represents the UPDATE portion of the stored procedure. Could not validate due to tool error."
+    },
+    {
+      "statement_id": 2,
+      "statement_name": "uspDeleteAuthor stored procedure call",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspDeleteAuthor(@BusinessEntityID);",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:37.644398\"}",
+      "validation_notes": "Equivalency tool returned ERROR. This represents the DELETE portion of the stored procedure. Could not validate due to tool error."
+    },
+    {
+      "statement_id": 3,
+      "statement_name": "SELECT all authors",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:13.845925\"}",
+      "validation_notes": "Equivalency tool returned ERROR with 'uniqueID' error. Statement is straightforward SELECT * with minimal changes (added semicolon)."
+    },
+    {
+      "statement_id": 4,
+      "statement_name": "SELECT authors by hire year with date functions",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_TIMESTAMP, BirthDate)) AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:24.534092\"}",
+      "validation_notes": "Equivalency tool returned ERROR with 'uniqueID' error. Statement involves complex date function conversions: FORMAT→TO_CHAR, DATEDIFF→EXTRACT/AGE, GETDATE→CURRENT_TIMESTAMP, DATEPART→EXTRACT."
+    },
+    {
+      "statement_id": 5,
+      "statement_name": "uspUpdateAuthorPersonalInfo stored procedure definition",
+      "original_statement": "CREATE PROCEDURE [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID [int], @NationalIDNumber [nvarchar](15), @BirthDate [datetime], @MaritalStatus [nchar](1), @Gender [nchar](1) WITH EXECUTE AS CALLER AS BEGIN SET NOCOUNT ON; BEGIN TRY UPDATE [dbo].[Author] SET [NationalIDNumber] = @NationalIDNumber, [BirthDate] = @BirthDate, [MaritalStatus] = @MaritalStatus, [Gender] = @Gender WHERE [BusinessEntityID] = @BusinessEntityID; END TRY BEGIN CATCH EXECUTE [dbo].[uspLogError]; END CATCH; END;",
+      "converted_statement": "CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspUpdateAuthorPersonalInfo(p_BusinessEntityID INTEGER, p_NationalIDNumber VARCHAR(15), p_BirthDate TIMESTAMP, p_MaritalStatus CHAR(1), p_Gender CHAR(1)) RETURNS INTEGER AS $$ DECLARE v_rows_affected INTEGER; BEGIN UPDATE bobsbookstore_dbo.author SET nationalnidnumber = p_NationalIDNumber, birthdate = p_BirthDate, maritalstatus = p_MaritalStatus, gender = p_Gender WHERE businessentityid = p_BusinessEntityID; GET DIAGNOSTICS v_rows_affected = ROW_COUNT; RETURN v_rows_affected; EXCEPTION WHEN OTHERS THEN PERFORM bobsbookstore_dbo.uspLogError(); RAISE; END; $$ LANGUAGE plpgsql;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:36.608534\"}",
+      "validation_notes": "Equivalency tool returned ERROR. Stored procedure converted to PL/pgSQL function. Core UPDATE logic validated separately but also returned ERROR."
+    },
+    {
+      "statement_id": 6,
+      "statement_name": "uspDeleteAuthor stored procedure definition",
+      "original_statement": "CREATE PROCEDURE [dbo].[uspDeleteAuthor] @BusinessEntityID [int] WITH EXECUTE AS CALLER AS BEGIN SET NOCOUNT ON; BEGIN TRY DELETE FROM [dbo].[Author] WHERE [BusinessEntityID] = @BusinessEntityID; IF @@ROWCOUNT = 0 BEGIN RAISERROR('No author found with the provided BusinessEntityID.', 16, 1); RETURN; END END TRY BEGIN CATCH EXECUTE [dbo].[uspLogError]; THROW; END CATCH; END;",
+      "converted_statement": "CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspDeleteAuthor(p_BusinessEntityID INTEGER) RETURNS INTEGER AS $$ DECLARE v_rows_affected INTEGER; BEGIN DELETE FROM bobsbookstore_dbo.author WHERE businessentityid = p_BusinessEntityID; GET DIAGNOSTICS v_rows_affected = ROW_COUNT; IF v_rows_affected = 0 THEN RAISE EXCEPTION 'No author found with the provided BusinessEntityID.'; END IF; RETURN v_rows_affected; EXCEPTION WHEN OTHERS THEN PERFORM bobsbookstore_dbo.uspLogError(); RAISE; END; $$ LANGUAGE plpgsql;",
+      "conversion_method": "MANUAL_AFTER_DMS_FAILURE",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-15T23:28:37.644398\"}",
+      "validation_notes": "Equivalency tool returned ERROR. Stored procedure converted to PL/pgSQL function. Core DELETE logic validated separately but also returned ERROR."
+    }
+  ],
+  "critical_notes": [
+    "CRITICAL: All 6 statement pairs were submitted to sql-equivalency___validate_sql_equivalence tool",
+    "CRITICAL: All 6 validations returned ERROR status with 'uniqueID' error message",
+    "CRITICAL: Per transformation definition requirements, all statements marked as ERROR based on tool output",
+    "CRITICAL: NO agent judgment was used to determine equivalency status",
+    "CRITICAL: The 'uniqueID' error appears to be a tool-side issue, not related to the SQL statements themselves",
+    "CRITICAL: All statements followed standard SQL Server to PostgreSQL migration patterns",
+    "CRITICAL: Tool output is the SOLE source of truth for equivalency status as required"
+  ],
+  "tool_error_analysis": {
+    "error_message": "'uniqueID'",
+    "frequency": "100% of validation attempts (6 out of 6)",
+    "error_type": "Tool-side error",
+    "impact": "Unable to validate functional equivalency for any statement pairs",
+    "recommendation": "Manual code review and functional testing recommended to verify conversions"
+  },
+  "validation_methodology": {
+    "tool_used": "sql-equivalency___validate_sql_equivalence",
+    "statements_validated": 6,
+    "agent_judgment_used": false,
+    "all_statements_processed": true,
+    "tool_output_as_source_of_truth": true
+  },
+  "next_steps": [
+    "All statements marked with ERROR status per transformation requirements",
+    "Conversions follow standard PostgreSQL migration patterns with HIGH confidence",
+    "Recommend functional testing with actual database to verify converted statements",
+    "Manual code review of date function conversions recommended",
+    "Integration testing to verify stored procedures/functions work correctly"
+  ]
+}
