@@ -1,0 +1,79 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "statement_number": 1,
+      "statement_description": "Edit author using stored procedure",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "SELECT dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-22T23:00:05.903240"
+      },
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_number": 2,
+      "statement_description": "Find all authors",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-22T23:00:14.569042"
+      },
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_number": 3,
+      "statement_description": "Delete author using stored procedure",
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "SELECT dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-22T23:00:23.497092"
+      },
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_number": 4,
+      "statement_description": "Select authors by hire year with SQL Server-specific functions",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, DATE_PART('year', AGE(NOW(), birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-22T23:00:33.714748"
+      },
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_number": 5,
+      "statement_description": "Get product data using stored procedure",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM dbo.uspgetproductdata();",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": {
+        "equivalence_status": "ERROR",
+        "error": "'uniqueID'",
+        "timestamp": "2026-02-22T23:00:44.979396"
+      },
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    }
+  ],
+  "notes": "All 5 statement pairs were processed through the SQL Equivalency MCP tool (sql-equivalency___validate_sql_equivalence). All returned ERROR status with error message 'uniqueID'. No agent judgment was used to determine equivalency status - all statuses come directly from the tool output. Manual review is recommended for all statements due to equivalency validation errors."
+}
