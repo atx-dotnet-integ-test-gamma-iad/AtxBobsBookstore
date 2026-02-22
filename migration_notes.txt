@@ -1,0 +1,203 @@
+================================================================================
+MIGRATION NOTES - SQL Statement Re-integration
+================================================================================
+Date: 2026-02-22
+Transformation ID: 20260222_002323_40fe9044
+================================================================================
+
+OVERVIEW
+--------
+All 5 SQL statements have been successfully re-integrated into the application code
+with their PostgreSQL equivalents. All SqlParameter references have been replaced
+with NpgsqlParameter using positional parameters ($1, $2, etc.).
+
+MANUAL CONVERSION APPLIED
+--------------------------
+Due to DMS MCP tool failures (metadata model creation error), all SQL conversions
+were performed manually following PostgreSQL best practices and lowercase schema
+mapping rules as specified in the transformation definition.
+
+DETAILED CONVERSION SUMMARY
+============================
+
+Statement 1: uspUpdateAuthorPersonalInfo (AuthorsController.cs, Line 163)
+--------------------------------------------------------------------------
+Original SQL:
+  DECLARE @rowsAffected INT;
+  EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] 
+    @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+  SELECT @rowsAffected;
+
+Converted SQL:
+  SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);
+
+Changes Applied:
+- Removed DECLARE/EXEC pattern (PostgreSQL uses function calls)
+- Schema: [dbo] → bobsbookstore_dbo (lowercase)
+- Function name: uspUpdateAuthorPersonalInfo → uspupdateauthorpersonalinfo (lowercase)
+- Parameters: @BusinessEntityID, @NationalIDNumber, etc. → $1, $2, $3, $4, $5 (positional)
+- SqlParameter → NpgsqlParameter (5 occurrences)
+- Special handling preserved: birthDate.ToUniversalTime()
+
+Status: ✓ Successfully re-integrated
+
+Statement 2: Simple SELECT from author table (AuthorsController.cs, Line 187)
+-----------------------------------------------------------------------------
+Original SQL:
+  SELECT * FROM bobsbookstore_dbo.author;
+
+Converted SQL:
+  SELECT * FROM bobsbookstore_dbo.author;
+
+Changes Applied:
+- None (already PostgreSQL compatible)
+- Schema and table name already lowercase
+
+Status: ✓ No changes needed - already compatible
+
+Statement 3: uspDeleteAuthor (AuthorsController.cs, Line 208)
+--------------------------------------------------------------
+Original SQL:
+  DECLARE @rowsAffected INT;
+  EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+  SELECT @rowsAffected;
+
+Converted SQL:
+  SELECT bobsbookstore_dbo.uspdeleteauthor($1);
+
+Changes Applied:
+- Removed DECLARE/EXEC pattern (PostgreSQL uses function calls)
+- Schema: [dbo] → bobsbookstore_dbo (lowercase)
+- Function name: uspDeleteAuthor → uspdeleteauthor (lowercase)
+- Parameters: @BusinessEntityID → $1 (positional)
+- SqlParameter → NpgsqlParameter (1 occurrence)
+
+Status: ✓ Successfully re-integrated
+
+Statement 4: Complex SELECT with SQL Server functions (AuthorsController.cs, Line 228)
+---------------------------------------------------------------------------------------
+Original SQL:
+  SELECT BusinessEntityID, 
+         FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, 
+         DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age 
+  FROM bobsbookstore_dbo.author 
+  WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+Converted SQL:
+  SELECT businessentityid, 
+         TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, 
+         DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate)) AS age 
+  FROM bobsbookstore_dbo.author 
+  WHERE EXTRACT(YEAR FROM hiredate) = $1;
+
+Changes Applied:
+- Column names: BusinessEntityID → businessentityid (lowercase)
+- FORMAT() → TO_CHAR() with PostgreSQL format pattern ('YYYY-MM-DD HH24:MI:SS')
+- DATEDIFF(YEAR, BirthDate, GETDATE()) → DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate))
+- DATEPART(YEAR, HireDate) → EXTRACT(YEAR FROM hiredate)
+- Parameters: @HireDate → $1 (positional)
+- All column references converted to lowercase
+- SqlParameter → NpgsqlParameter (1 occurrence)
+
+Status: ✓ Successfully re-integrated
+Note: This is the most complex conversion requiring multiple function transformations
+
+Statement 5: uspGetProductData (ProductsController.cs, Line 33)
+----------------------------------------------------------------
+Original SQL:
+  EXEC [dbo].[uspGetProductData];
+
+Converted SQL:
+  SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
+
+Changes Applied:
+- EXEC → SELECT * FROM (PostgreSQL function returning table)
+- Schema: [dbo] → bobsbookstore_dbo (lowercase)
+- Function name: uspGetProductData → uspgetproductdata (lowercase)
+- Added () to indicate function call
+
+Status: ✓ Successfully re-integrated
+
+================================================================================
+PARAMETER CONVERSION SUMMARY
+================================================================================
+
+Total SqlParameter References: 7
+Total NpgsqlParameter References: 7
+
+Conversions:
+1. AuthorsController.cs, EditUsingStoredProcedure:
+   - 5 SqlParameter → 5 NpgsqlParameter (businessEntityId, nationalIdNumber, birthDate, maritalStatus, gender)
+   - All using positional parameters ($1-$5)
+
+2. AuthorsController.cs, DeleteAuthorEmbeddedSql:
+   - 1 SqlParameter → 1 NpgsqlParameter (businessEntityId)
+   - Using positional parameter ($1)
+
+3. AuthorsController.cs, SelectAuthorsByHireYear:
+   - 1 SqlParameter → 1 NpgsqlParameter (hireYear)
+   - Using positional parameter ($1)
+
+Parameter Binding Method:
+- Changed from: new SqlParameter("@ParameterName", value)
+- Changed to: new NpgsqlParameter { Value = value }
+- PostgreSQL uses positional parameters ($1, $2, etc.) instead of named parameters
+
+================================================================================
+VALIDATION CHECKS
+================================================================================
+
+✓ All 5 SQL statements replaced with PostgreSQL equivalents
+✓ All 7 SqlParameter references replaced with NpgsqlParameter
+✓ Schema references updated (manual lowercase conversion applied)
+✓ Parameter names and bindings preserved correctly
+✓ Special date handling (.ToUniversalTime()) preserved
+✓ No SqlParameter references remain in code
+✓ Using directives include 'using Npgsql;' in both controller files
+✓ All stored procedure calls converted to PostgreSQL function calls
+✓ All SQL Server specific functions converted to PostgreSQL equivalents
+
+================================================================================
+MANUAL REVIEW REQUIRED
+================================================================================
+
+Due to both DMS MCP tool and SQL Equivalency tool failures, the following items
+require manual verification:
+
+1. Verify stored procedures exist as functions in PostgreSQL schema:
+   - bobsbookstore_dbo.uspupdateauthorpersonalinfo
+   - bobsbookstore_dbo.uspdeleteauthor
+   - bobsbookstore_dbo.uspgetproductdata
+
+2. Test each converted statement against PostgreSQL database to verify:
+   - Correct result sets returned
+   - Parameters properly bound
+   - Function conversions produce equivalent results
+   - Date/time formatting matches expectations
+
+3. Verify AuthorAgeResult model matches lowercase column names:
+   - businessentityid
+   - formattedmodifieddate
+   - age
+
+4. Test application functionality:
+   - Create/edit author operations
+   - Delete author operations
+   - View all authors
+   - Filter authors by hire year
+   - View all products
+
+================================================================================
+SCHEMA NAMING CONVENTION
+================================================================================
+
+All manual conversions applied lowercase schema object names for PostgreSQL
+compatibility as specified by the transformation definition:
+- Tables: author (already lowercase)
+- Functions: uspupdateauthorpersonalinfo, uspdeleteauthor, uspgetproductdata
+- Columns: businessentityid, modifieddate, birthdate, hiredate, etc.
+
+Note: If PostgreSQL schema objects use different naming conventions, statements
+will need to be adjusted accordingly after schema verification.
+
+================================================================================

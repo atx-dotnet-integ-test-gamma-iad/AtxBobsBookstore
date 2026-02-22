@@ -1,0 +1,173 @@
+========================================================================
+DMS MCP TOOL CONVERSION LOG
+========================================================================
+Date: 2026-02-22
+Transformation ID: 20260222_002323_40fe9044
+DMS Tool Status: ALL CONVERSIONS FAILED - Metadata model creation error
+========================================================================
+
+STATEMENT 1: uspUpdateAuthorPersonalInfo Stored Procedure Call
+========================================================================
+Original SQL:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;
+SELECT @rowsAffected;
+
+DMS Input Parameters:
+- schema_name: dbo
+- database_name: BobsBookstore
+- region: us-east-1
+
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Timestamp: 2026-02-22T00:31:07.736582
+
+Manual Conversion Applied: YES
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Reason: DMS tool consistently failed for all statements with metadata model creation error
+
+Manual Conversion Logic:
+- PostgreSQL uses SELECT to call functions, not EXEC
+- Stored procedures in PostgreSQL are typically replaced with functions
+- Parameter names converted from @param to param (dollar sign prefix optional)
+- Schema changed to bobsbookstore_dbo (lowercase)
+- Function returns value directly, no DECLARE/EXEC pattern needed
+
+Converted SQL:
+SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);
+
+========================================================================
+STATEMENT 2: Simple SELECT from author table
+========================================================================
+Original SQL:
+SELECT * FROM bobsbookstore_dbo.author;
+
+DMS Input Parameters:
+- schema_name: bobsbookstore_dbo
+- database_name: BobsBookstore
+- region: us-east-1
+
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Timestamp: 2026-02-22T00:31:19.109183
+
+Manual Conversion Applied: YES
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Reason: DMS tool consistently failed for all statements with metadata model creation error
+
+Manual Conversion Logic:
+- Schema name already lowercase (bobsbookstore_dbo)
+- Table name converted to lowercase (author -> author, already lowercase)
+- SELECT * syntax is compatible with PostgreSQL
+- No changes needed as schema and table are already lowercase
+
+Converted SQL:
+SELECT * FROM bobsbookstore_dbo.author;
+
+========================================================================
+STATEMENT 3: uspDeleteAuthor Stored Procedure Call
+========================================================================
+Original SQL:
+DECLARE @rowsAffected INT;
+EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;
+SELECT @rowsAffected;
+
+DMS Input Parameters:
+- schema_name: dbo
+- database_name: BobsBookstore
+- region: us-east-1
+
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Timestamp: 2026-02-22T00:31:30.857394
+
+Manual Conversion Applied: YES
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Reason: DMS tool consistently failed for all statements with metadata model creation error
+
+Manual Conversion Logic:
+- PostgreSQL uses SELECT to call functions, not EXEC
+- Stored procedures in PostgreSQL are typically replaced with functions
+- Parameter names converted from @param to positional ($1)
+- Schema changed from [dbo] to bobsbookstore_dbo (lowercase)
+- Function name converted to lowercase (uspDeleteAuthor -> uspdeleteauthor)
+- Function returns value directly, no DECLARE/EXEC pattern needed
+
+Converted SQL:
+SELECT bobsbookstore_dbo.uspdeleteauthor($1);
+
+========================================================================
+STATEMENT 4: Complex SELECT with SQL Server Functions
+========================================================================
+Original SQL:
+SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+
+DMS Input Parameters:
+- schema_name: bobsbookstore_dbo
+- database_name: BobsBookstore
+- region: us-east-1
+
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Timestamp: 2026-02-22T00:31:42.853937
+
+Manual Conversion Applied: YES
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Reason: DMS tool consistently failed for all statements with metadata model creation error
+
+Manual Conversion Logic:
+- Column names converted to lowercase (BusinessEntityID -> businessentityid)
+- FORMAT() -> TO_CHAR() with PostgreSQL date format pattern
+- DATEDIFF(YEAR, ...) -> DATE_PART('year', AGE(...))
+- GETDATE() -> CURRENT_TIMESTAMP
+- DATEPART(YEAR, ...) -> EXTRACT(YEAR FROM ...)
+- Parameter @HireDate converted to $1
+- Table already has lowercase schema (bobsbookstore_dbo)
+
+Converted SQL:
+SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = $1;
+
+========================================================================
+STATEMENT 5: uspGetProductData Stored Procedure Call
+========================================================================
+Original SQL:
+EXEC [dbo].[uspGetProductData];
+
+DMS Input Parameters:
+- schema_name: dbo
+- database_name: BobsBookstore
+- region: us-east-1
+
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}
+DMS Timestamp: 2026-02-22T00:31:54.014716
+
+Manual Conversion Applied: YES
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Reason: DMS tool consistently failed for all statements with metadata model creation error
+
+Manual Conversion Logic:
+- PostgreSQL uses SELECT to call functions, not EXEC
+- Stored procedures in PostgreSQL are typically replaced with functions
+- Schema changed from [dbo] to bobsbookstore_dbo (lowercase)
+- Function name converted to lowercase (uspGetProductData -> uspgetproductdata)
+- No parameters needed
+
+Converted SQL:
+SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
+
+========================================================================
+SUMMARY
+========================================================================
+Total Statements Processed: 5
+DMS Successful Conversions: 0
+DMS Failed Conversions: 5
+Manual Conversions Applied: 5
+
+Critical Issue: DMS MCP tool failed for ALL statements with consistent error:
+"Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+
+All conversions performed manually following PostgreSQL best practices and
+lowercase schema mapping rules as specified in the transformation definition.
+
+========================================================================

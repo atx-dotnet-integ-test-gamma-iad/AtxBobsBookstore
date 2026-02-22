@@ -1,0 +1,101 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "statement_id": 1,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 163,
+      "method_name": "EditUsingStoredProcedure",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-22T00:33:06.663396\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_id": 2,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 187,
+      "method_name": "FindAllAuthorsEmbeddedSql",
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-22T00:32:45.545616\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_id": 3,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 208,
+      "method_name": "DeleteAuthorEmbeddedSql",
+      "original_statement": "DECLARE @rowsAffected INT;\nEXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;\nSELECT @rowsAffected;",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor($1);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-22T00:33:15.730880\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_id": 4,
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 228,
+      "method_name": "SelectAuthorsByHireYear",
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM bobsbookstore_dbo.author WHERE DATEPART(YEAR, HireDate) = @HireDate;",
+      "converted_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, DATE_PART('year', AGE(CURRENT_TIMESTAMP, birthdate)) AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = $1;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-22T00:32:55.745575\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    },
+    {
+      "statement_id": 5,
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "source_line": 33,
+      "method_name": "FindAllProducts",
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-02-22T00:33:25.831223\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}"
+    }
+  ],
+  "critical_issues": [
+    {
+      "issue_type": "DMS_TOOL_FAILURE",
+      "description": "All 5 SQL statements failed DMS conversion with error: Metadata model creation failed: {'error': 'Unknown metadata model creation status: RECEIVED'}",
+      "impact": "All conversions performed manually using PostgreSQL best practices and lowercase schema mapping rules",
+      "resolution": "Manual conversion applied to all statements following transformation definition guidelines"
+    },
+    {
+      "issue_type": "SQL_EQUIVALENCY_TOOL_FAILURE",
+      "description": "All 5 SQL statement pairs failed equivalency validation with error: 'uniqueID'",
+      "impact": "Unable to automatically verify equivalency of converted statements",
+      "resolution": "All statements marked with equivalency_status ERROR as required by transformation definition. Manual review recommended for all conversions."
+    }
+  ],
+  "conversion_notes": [
+    "Statement 1: Converted DECLARE/EXEC pattern to PostgreSQL function call with positional parameters",
+    "Statement 2: No changes needed - schema and table already lowercase compatible",
+    "Statement 3: Converted DECLARE/EXEC pattern to PostgreSQL function call with positional parameters",
+    "Statement 4: Complex conversion - FORMAT->TO_CHAR, DATEDIFF->DATE_PART(AGE), GETDATE->CURRENT_TIMESTAMP, DATEPART->EXTRACT, all column names to lowercase",
+    "Statement 5: Converted EXEC stored procedure to SELECT FROM PostgreSQL function returning table"
+  ],
+  "recommendations": [
+    "Manual verification required for all 5 converted statements due to DMS and equivalency tool failures",
+    "Test each converted statement against PostgreSQL database to verify functionality",
+    "Verify that stored procedures exist as functions in PostgreSQL schema bobsbookstore_dbo",
+    "Review parameter handling and ensure positional parameters ($1, $2, etc.) are correctly mapped",
+    "Validate date/time function conversions produce equivalent results"
+  ],
+  "tool_status_summary": {
+    "dms_tool_status": "FAILED - All 5 statements failed with metadata model creation error",
+    "sql_equivalency_tool_status": "FAILED - All 5 statement pairs failed with 'uniqueID' error",
+    "manual_intervention_required": true
+  }
+}
