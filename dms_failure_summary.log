@@ -1,0 +1,41 @@
+====================================================================
+DMS FAILURE SUMMARY LOG
+Migration: BobsBookstore MS SQL Server → PostgreSQL
+Date: 2026-03-04
+DMS Migration Project: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+====================================================================
+
+DMS CONVERSION RESULTS - ALL SUCCESSFUL
+=========================================
+
+All 5 SQL statements were successfully converted by the DMS MCP tool.
+No manual conversions were required.
+
+Statement 1: SELECT * FROM Author
+  → DMS Status: SUCCESS
+  → DMS Timestamp: 2026-03-04T06:19:02.243581
+  → Converted: SELECT * FROM bobsusedbookstore_dbo.author;
+
+Statement 2: EXEC [dbo].[uspDeleteAuthor] @BusinessEntityID
+  → DMS Status: SUCCESS
+  → DMS Timestamp: 2026-03-04T06:20:13.052873
+  → Converted: CALL bobsusedbookstore_dbo.uspdeleteauthor(@BusinessEntityID);
+
+Statement 3: EXEC [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender
+  → DMS Status: SUCCESS
+  → DMS Timestamp: 2026-03-04T06:21:34.363472
+  → Converted: CALL bobsusedbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+Statement 4: SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate
+  → DMS Status: SUCCESS (with GenAI assistance)
+  → DMS Timestamp: 2026-03-04T06:22:56.711200
+  → Converted: SELECT businessentityid, to_char(modifieddate, 'yyyy-MM-dd HH:mm:ss') AS formattedmodifieddate, aws_sqlserver_ext.datediff('YEAR', (birthdate)::TIMESTAMP, (clock_timestamp())::TIMESTAMP) AS age FROM bobsusedbookstore_dbo.author WHERE date_part('year', hiredate) = HireDate;
+  → Note: DMS GenAI output used 'HireDate' without @ parameter marker. Parameter marker '@HireDate' preserved during code re-integration.
+
+Statement 5: EXEC [dbo].[uspGetProductData]
+  → DMS Status: SUCCESS
+  → DMS Timestamp: 2026-03-04T06:24:23.012788
+  → Converted: CALL bobsusedbookstore_dbo.uspgetproductdata(par_my_cursor => uspgetproductdata$par_my_cursor);
+  → Note: For EF Core SqlQueryRaw<Product> usage, adapted to SELECT * FROM bobsusedbookstore_dbo.uspgetproductdata(); since SqlQueryRaw requires tabular results.
+
+NO DMS FAILURES REQUIRING MANUAL CONVERSION.

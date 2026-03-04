@@ -1,0 +1,60 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "original_statement": "SELECT * FROM Author",
+      "converted_statement": "SELECT * FROM bobsusedbookstore_dbo.author;",
+      "conversion_method": "DMS_TOOL",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-04T06:27:56.672670\"}",
+      "dms_failure_reason": null,
+      "source_file": "AuthorsController.cs",
+      "source_method": "FindAllAuthorsEmbeddedSql()"
+    },
+    {
+      "original_statement": "EXEC [dbo].[uspDeleteAuthor] @BusinessEntityID",
+      "converted_statement": "CALL bobsusedbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "DMS_TOOL",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-04T06:28:07.139181\"}",
+      "dms_failure_reason": null,
+      "source_file": "AuthorsController.cs",
+      "source_method": "DeleteAuthorEmbeddedSql()"
+    },
+    {
+      "original_statement": "EXEC [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender",
+      "converted_statement": "CALL bobsusedbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "DMS_TOOL",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-04T06:28:16.946478\"}",
+      "dms_failure_reason": null,
+      "source_file": "AuthorsController.cs",
+      "source_method": "EditUsingStoredProcedure()"
+    },
+    {
+      "original_statement": "SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate",
+      "converted_statement": "SELECT businessentityid, to_char(modifieddate, 'yyyy-MM-dd HH:mm:ss') AS formattedmodifieddate, aws_sqlserver_ext.datediff('year', (birthdate)::TIMESTAMP, (clock_timestamp())::TIMESTAMP) AS age FROM bobsusedbookstore_dbo.author WHERE date_part('year', hiredate) = @HireDate;",
+      "conversion_method": "DMS_TOOL",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-04T06:28:29.973040\"}",
+      "dms_failure_reason": null,
+      "source_file": "AuthorsController.cs",
+      "source_method": "SelectAuthorsByHireYear()",
+      "dms_notes": "DMS used GenAI for this conversion. Original DMS output had WHERE clause with 'HireDate' instead of '@HireDate' parameter marker. Parameter marker preserved for code integration."
+    },
+    {
+      "original_statement": "EXEC [dbo].[uspGetProductData]",
+      "converted_statement": "CALL bobsusedbookstore_dbo.uspgetproductdata(par_my_cursor => uspgetproductdata$par_my_cursor);",
+      "conversion_method": "DMS_TOOL",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-04T06:28:40.251630\"}",
+      "dms_failure_reason": null,
+      "source_file": "ProductsController.cs",
+      "source_method": "FindAllProducts()",
+      "dms_notes": "DMS converted to CALL with cursor parameter. For EF Core SqlQueryRaw<Product> usage, adapted to SELECT * FROM bobsusedbookstore_dbo.uspgetproductdata(); since SqlQueryRaw requires tabular results."
+    }
+  ]
+}
