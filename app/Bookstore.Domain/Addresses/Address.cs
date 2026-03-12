@@ -1,4 +1,5 @@
-﻿using Bookstore.Domain.Customers;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Bookstore.Domain.Customers;
 
 namespace Bookstore.Domain.Addresses
 {
