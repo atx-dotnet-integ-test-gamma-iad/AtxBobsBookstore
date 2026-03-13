@@ -1,3 +1,6 @@
+﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Bookstore.Domain.Authors;
 
 public class AuthorAgeResult
