@@ -1,0 +1,81 @@
+============================================================
+DMS Migration Log - BobsBookstore SQL Server to PostgreSQL
+Date: 2026-03-20 (Re-attempt)
+Migration Project ARN: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+Region: us-east-1
+Database: BobsBookstore
+Server: 172.31.93.178
+============================================================
+
+--- Statement 1: EditUsingStoredProcedure ---
+Original SQL: EXEC [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender
+DMS Tool Invocation Time: 2026-03-20T23:28:08.214948
+DMS Schema: dbo
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}"}
+DMS Error Timestamp: 2026-03-20T23:28:22.827410
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Manual Conversion Result: SELECT uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+Conversion Rationale: EXEC with stored procedure converted to PostgreSQL function call syntax. Schema object names converted to lowercase. Variable declaration and assignment removed as PostgreSQL functions return values directly.
+
+--- Statement 2: FindAllAuthorsEmbeddedSql ---
+Original SQL: SELECT * FROM Author
+DMS Tool Invocation Time: 2026-03-20T23:28:31.326762
+DMS Schema: dbo
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}"}
+DMS Error Timestamp: 2026-03-20T23:28:45.987223
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Manual Conversion Result: SELECT * FROM author
+Conversion Rationale: Table name 'Author' converted to lowercase 'author' for PostgreSQL compatibility.
+
+--- Statement 3: DeleteAuthorEmbeddedSql ---
+Original SQL: EXEC [dbo].[uspDeleteAuthor] @BusinessEntityID
+DMS Tool Invocation Time: 2026-03-20T23:28:56.210894
+DMS Schema: dbo
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}"}
+DMS Error Timestamp: 2026-03-20T23:29:10.841828
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Manual Conversion Result: SELECT uspdeleteauthor(@BusinessEntityID);
+Conversion Rationale: EXEC with stored procedure converted to PostgreSQL function call syntax. Schema object names converted to lowercase. Variable declaration and assignment removed as PostgreSQL functions return values directly.
+
+--- Statement 4: SelectAuthorsByHireYear ---
+Original SQL: SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+DMS Tool Invocation Time: 2026-03-20T23:29:19.445228
+DMS Schema: dbo
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}"}
+DMS Error Timestamp: 2026-03-20T23:29:34.136526
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Manual Conversion Result: SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(NOW(), birthdate))::INT AS age FROM author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;
+Conversion Rationale: FORMAT() converted to TO_CHAR(). DATEDIFF(YEAR,...) converted to EXTRACT(YEAR FROM AGE(...)). GETDATE() converted to NOW(). DATEPART(YEAR,...) converted to EXTRACT(YEAR FROM ...). All schema object names (table, columns) converted to lowercase.
+
+--- Statement 5: FindAllProducts ---
+Original SQL: EXEC [dbo].[uspGetProductData];
+DMS Tool Invocation Time: 2026-03-20T23:29:42.213906
+DMS Schema: dbo
+DMS Status: ERROR
+DMS Error: Metadata model creation failed: {'error': "Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}"}
+DMS Error Timestamp: 2026-03-20T23:29:56.767852
+Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+Manual Conversion Result: SELECT * FROM uspgetproductdata();
+Conversion Rationale: EXEC with stored procedure converted to PostgreSQL function call syntax with SELECT * FROM function(). Schema object names converted to lowercase.
+
+============================================================
+Summary
+============================================================
+Total statements processed through DMS: 5
+DMS successful conversions: 0
+DMS failures: 5
+Manual conversions applied: 5
+Common DMS error: Metadata model creation failed - No objects found per selection rules
+All manual conversions follow DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA rules:
+  - All schema object names (tables, columns, procedures) converted to lowercase
+  - SQL Server specific syntax converted to PostgreSQL equivalents
+  - EXEC stored_proc converted to SELECT function_name()
+  - SQL Server date functions converted to PostgreSQL date functions
+
+============================================================
+End of DMS Migration Log
+============================================================
