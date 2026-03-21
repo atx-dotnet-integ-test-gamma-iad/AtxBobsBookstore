@@ -1,0 +1,63 @@
+{
+  "number_of_statements_processed": 5,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 5,
+  "statement_details": [
+    {
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-21T00:51:44.219237\"}",
+      "dms_failure_reason": "Metadata model creation failed: No objects were found according to the specified selection rules. Please review your selection rules and try again.",
+      "source_file": "sourceCode/app/Bookstore.Web/Controllers/ProductsController.cs",
+      "source_line": 34,
+      "source_method": "FindAllProducts"
+    },
+    {
+      "original_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-21T00:51:59.172536\"}",
+      "dms_failure_reason": "Metadata model creation failed: No objects were found according to the specified selection rules. Please review your selection rules and try again.",
+      "source_file": "sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 163,
+      "source_method": "EditUsingStoredProcedure"
+    },
+    {
+      "original_statement": "SELECT * FROM bobsbookstore_dbo.\"author\"",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.\"author\"",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-21T00:52:08.975104\"}",
+      "dms_failure_reason": "Metadata model creation failed: No objects were found according to the specified selection rules. Please review your selection rules and try again.",
+      "source_file": "sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 187,
+      "source_method": "FindAllAuthorsEmbeddedSql"
+    },
+    {
+      "original_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "converted_statement": "SELECT bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-21T00:52:19.414545\"}",
+      "dms_failure_reason": "Metadata model creation failed: No objects were found according to the specified selection rules. Please review your selection rules and try again.",
+      "source_file": "sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 208,
+      "source_method": "DeleteAuthorEmbeddedSql"
+    },
+    {
+      "original_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthdate))::INTEGER AS age FROM bobsbookstore_dbo.\"author\" WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "converted_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthdate))::INTEGER AS age FROM bobsbookstore_dbo.\"author\" WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-21T00:52:31.002846\"}",
+      "dms_failure_reason": "Metadata model creation failed: No objects were found according to the specified selection rules. Please review your selection rules and try again.",
+      "source_file": "sourceCode/app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_line": 228,
+      "source_method": "SelectAuthorsByHireYear"
+    }
+  ]
+}
