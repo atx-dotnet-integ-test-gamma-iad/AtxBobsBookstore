@@ -1,0 +1,103 @@
+-- ============================================================================
+-- Converted SQL Statements Catalog
+-- Project: BobsBookstore - MS SQL Server to PostgreSQL Migration
+-- DMS Migration Project ARN: arn:aws:dms:us-east-1:812756961751:migration-project:XHQ6HWG6R5HVREIQZZEZRV7WFI
+-- DMS Tool Status: ALL 5 statements FAILED - Metadata model creation error
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA (all 5)
+-- Total Statements: 5
+-- ============================================================================
+
+-- ============================================================================
+-- Statement 1
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: EditUsingStoredProcedure
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects were found according to the specified selection rules.
+-- DMS Submission Timestamp: 2026-03-21T08:53:08.722656
+-- DMS Error Timestamp: 2026-03-21T08:53:22.407423
+-- Manual Conversion Rationale:
+--   - Mapped [dbo] schema to bobsbookstore_dbo (PostgreSQL target schema)
+--   - Converted EXEC stored procedure call to SELECT * FROM schema.function(params) syntax
+--   - Removed DECLARE @var/SELECT @var patterns (PostgreSQL functions return results directly)
+--   - Converted all schema object names to lowercase (uspUpdateAuthorPersonalInfo -> uspupdateauthorpersonalinfo)
+-- ============================================================================
+-- Original MS SQL:
+-- DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;
+-- Converted PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);
+
+-- ============================================================================
+-- Statement 2
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: FindAllAuthorsEmbeddedSql
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects were found according to the specified selection rules.
+-- DMS Submission Timestamp: 2026-03-21T08:53:30.048128
+-- DMS Error Timestamp: 2026-03-21T08:53:43.772776
+-- Manual Conversion Rationale:
+--   - Mapped unqualified table name 'Author' to bobsbookstore_dbo.author (schema-qualified, lowercase)
+--   - Applied lowercase schema mapping rules
+-- ============================================================================
+-- Original MS SQL:
+-- SELECT * FROM Author
+-- Converted PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.author
+
+-- ============================================================================
+-- Statement 3
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: DeleteAuthorEmbeddedSql
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects were found according to the specified selection rules.
+-- DMS Submission Timestamp: 2026-03-21T08:53:51.293189
+-- DMS Error Timestamp: 2026-03-21T08:54:05.012234
+-- Manual Conversion Rationale:
+--   - Mapped [dbo] schema to bobsbookstore_dbo (PostgreSQL target schema)
+--   - Converted EXEC stored procedure call to SELECT * FROM schema.function(params) syntax
+--   - Removed DECLARE @var/SELECT @var patterns (PostgreSQL functions return results directly)
+--   - Converted all schema object names to lowercase (uspDeleteAuthor -> uspdeleteauthor)
+-- ============================================================================
+-- Original MS SQL:
+-- DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;
+-- Converted PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);
+
+-- ============================================================================
+-- Statement 4
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: SelectAuthorsByHireYear
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects were found according to the specified selection rules.
+-- DMS Submission Timestamp: 2026-03-21T08:54:13.226661
+-- DMS Error Timestamp: 2026-03-21T08:54:27.045830
+-- Manual Conversion Rationale:
+--   - Mapped unqualified table name 'Author' to bobsbookstore_dbo.author (schema-qualified, lowercase)
+--   - Converted column names to lowercase (BusinessEntityID -> businessentityid, ModifiedDate -> modifieddate, etc.)
+--   - Converted alias names to lowercase (FormattedModifiedDate -> formattedmodifieddate, Age -> age)
+--   - Converted FORMAT(date, 'format') to TO_CHAR(date, 'format') with PostgreSQL format specifiers
+--   - Converted DATEDIFF(YEAR, date1, date2) to EXTRACT(YEAR FROM AGE(date2, date1))::INTEGER
+--   - Converted GETDATE() to CURRENT_DATE
+--   - Converted DATEPART(YEAR, date) to EXTRACT(YEAR FROM date)
+-- ============================================================================
+-- Original MS SQL:
+-- SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;
+-- Converted PostgreSQL:
+SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthdate))::INTEGER AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;
+
+-- ============================================================================
+-- Statement 5
+-- Source File: app/Bookstore.Web/Controllers/ProductsController.cs
+-- Method: FindAllProducts
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects were found according to the specified selection rules.
+-- DMS Submission Timestamp: 2026-03-21T08:54:34.421934
+-- DMS Error Timestamp: 2026-03-21T08:54:48.055173
+-- Manual Conversion Rationale:
+--   - Mapped [dbo] schema to bobsbookstore_dbo (PostgreSQL target schema)
+--   - Converted EXEC stored procedure call to SELECT * FROM schema.function() syntax
+--   - Converted function name to lowercase (uspGetProductData -> uspgetproductdata)
+-- ============================================================================
+-- Original MS SQL:
+-- EXEC [dbo].[uspGetProductData];
+-- Converted PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
