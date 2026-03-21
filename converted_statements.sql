@@ -1,0 +1,115 @@
+-- ============================================================================
+-- CONVERTED SQL STATEMENTS CATALOG
+-- Source: BobsBookstore .NET Application
+-- Purpose: All original MS SQL + converted PostgreSQL statement pairs
+-- Date: 2026-03-21
+-- Total Statements: 5
+-- DMS Tool Status: ALL 5 FAILED - Metadata model creation failed (re-attempted 3 times)
+-- Conversion Method Applied: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Failure Reason: Metadata model creation failed: No objects were found
+--   according to the specified selection rules.
+-- DMS Attempt Timestamps:
+--   Attempt 1 (initial): 2026-03-21T03:22:14 to 2026-03-21T03:24:01
+--   Attempt 2 (re-attempt): 2026-03-21T03:50:55 to 2026-03-21T03:52:13
+--   Attempt 3 (current run): 2026-03-21T04:20:34 to 2026-03-21T04:22:19
+-- ============================================================================
+
+-- ============================================================================
+-- Statement 1 of 5
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: EditUsingStoredProcedure
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects found
+-- DMS Attempt 1 Timestamp: 2026-03-21T03:22:14.913390
+-- DMS Attempt 2 Timestamp: 2026-03-21T03:50:55.826673
+-- DMS Attempt 3 Timestamp: 2026-03-21T04:20:34.559505
+-- Manual Conversion Notes:
+--   - EXEC [dbo].[proc] @params -> SELECT * FROM schema.proc($n) (PostgreSQL function call syntax)
+--   - Schema [dbo] -> bobsbookstore_dbo (PostgreSQL schema)
+--   - Procedure name lowercased: uspUpdateAuthorPersonalInfo -> uspupdateauthorpersonalinfo
+--   - Parameters @named -> $n positional (PostgreSQL parameterized query style)
+-- ============================================================================
+-- ORIGINAL MS SQL:
+-- EXEC [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender
+-- CONVERTED PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.uspupdateauthorpersonalinfo($1, $2, $3, $4, $5);
+
+-- ============================================================================
+-- Statement 2 of 5
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: FindAllAuthorsEmbeddedSql
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects found
+-- DMS Attempt 1 Timestamp: 2026-03-21T03:22:38.428843
+-- DMS Attempt 2 Timestamp: 2026-03-21T03:51:11.606358
+-- DMS Attempt 3 Timestamp: 2026-03-21T04:20:57.089384
+-- Manual Conversion Notes:
+--   - Schema [dbo] -> bobsbookstore_dbo (PostgreSQL schema)
+--   - Table name lowercased: [Author] -> author
+-- ============================================================================
+-- ORIGINAL MS SQL:
+-- SELECT * FROM [dbo].[Author]
+-- CONVERTED PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.author;
+
+-- ============================================================================
+-- Statement 3 of 5
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: DeleteAuthorEmbeddedSql
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects found
+-- DMS Attempt 1 Timestamp: 2026-03-21T03:23:04.391625
+-- DMS Attempt 2 Timestamp: 2026-03-21T03:51:27.347548
+-- DMS Attempt 3 Timestamp: 2026-03-21T04:21:19.613827
+-- Manual Conversion Notes:
+--   - EXEC [dbo].[proc] @param -> SELECT schema.proc($n) (PostgreSQL function call syntax)
+--   - Schema [dbo] -> bobsbookstore_dbo (PostgreSQL schema)
+--   - Procedure name lowercased: uspDeleteAuthor -> uspdeleteauthor
+--   - Parameter @BusinessEntityID -> $1 positional
+-- ============================================================================
+-- ORIGINAL MS SQL:
+-- EXEC [dbo].[uspDeleteAuthor] @BusinessEntityID
+-- CONVERTED PostgreSQL:
+SELECT bobsbookstore_dbo.uspdeleteauthor($1);
+
+-- ============================================================================
+-- Statement 4 of 5
+-- Source File: app/Bookstore.Web/Controllers/AuthorsController.cs
+-- Method: SelectAuthorsByHireYear
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects found
+-- DMS Attempt 1 Timestamp: 2026-03-21T03:23:27.333052
+-- DMS Attempt 2 Timestamp: 2026-03-21T03:51:42.999610
+-- DMS Attempt 3 Timestamp: 2026-03-21T04:21:42.361184
+-- Manual Conversion Notes:
+--   - Schema [dbo] -> bobsbookstore_dbo (PostgreSQL schema)
+--   - Table name lowercased: [Author] -> author
+--   - Column names lowercased: BusinessEntityID -> businessentityid, ModifiedDate -> modifieddate, etc.
+--   - CONVERT(VARCHAR, col, 120) -> TO_CHAR(col, 'YYYY-MM-DD HH24:MI:SS')
+--   - DATEDIFF(YEAR, BirthDate, GETDATE()) -> EXTRACT(YEAR FROM AGE(NOW(), birthdate))::INTEGER
+--   - YEAR(HireDate) -> EXTRACT(YEAR FROM hiredate)
+--   - @HireYear -> $1 positional parameter
+-- ============================================================================
+-- ORIGINAL MS SQL:
+-- SELECT BusinessEntityID, CONVERT(VARCHAR, ModifiedDate, 120) AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM [dbo].[Author] WHERE YEAR(HireDate) = @HireYear
+-- CONVERTED PostgreSQL:
+SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(NOW(), birthdate))::INTEGER AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = $1;
+
+-- ============================================================================
+-- Statement 5 of 5
+-- Source File: app/Bookstore.Web/Controllers/ProductsController.cs
+-- Method: FindAllProducts
+-- Conversion Method: DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA
+-- DMS Error: Metadata model creation failed: No objects found
+-- DMS Attempt 1 Timestamp: 2026-03-21T03:23:49.596480
+-- DMS Attempt 2 Timestamp: 2026-03-21T03:51:58.533644
+-- DMS Attempt 3 Timestamp: 2026-03-21T04:22:05.134908
+-- Manual Conversion Notes:
+--   - EXEC [dbo].[proc] -> SELECT * FROM schema.proc() (PostgreSQL function call syntax)
+--   - Schema [dbo] -> bobsbookstore_dbo (PostgreSQL schema)
+--   - Procedure name lowercased: uspGetProductData -> uspgetproductdata
+-- ============================================================================
+-- ORIGINAL MS SQL:
+-- EXEC [dbo].[uspGetProductData]
+-- CONVERTED PostgreSQL:
+SELECT * FROM bobsbookstore_dbo.uspgetproductdata();
