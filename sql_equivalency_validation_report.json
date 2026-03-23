@@ -1,0 +1,168 @@
+{
+  "number_of_statements_processed": 16,
+  "number_of_statements_equivalent": 0,
+  "number_of_statements_non_equivalent": 0,
+  "number_of_statements_with_equivalency_error": 16,
+  "statement_details": [
+    {
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;",
+      "converted_statement": "CALL bobsbookstore_dbo.uspupdateauthorpersonalinfo(@BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:40:47.530397\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "EditUsingStoredProcedure"
+    },
+    {
+      "original_statement": "SELECT * FROM [dbo].[Author]",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.author",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:40:59.097806\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "FindAllAuthorsEmbeddedSql"
+    },
+    {
+      "original_statement": "DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;",
+      "converted_statement": "CALL bobsbookstore_dbo.uspdeleteauthor(@BusinessEntityID);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:41:13.624763\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "DeleteAuthorEmbeddedSql"
+    },
+    {
+      "original_statement": "SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate))::INTEGER AS Age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM HireDate) = @HireDate;",
+      "converted_statement": "SELECT businessentityid, TO_CHAR(modifieddate, 'YYYY-MM-DD HH24:MI:SS') AS formattedmodifieddate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, birthdate))::INTEGER AS age FROM bobsbookstore_dbo.author WHERE EXTRACT(YEAR FROM hiredate) = @HireDate;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:41:26.369469\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "app/Bookstore.Web/Controllers/AuthorsController.cs",
+      "source_method": "SelectAuthorsByHireYear"
+    },
+    {
+      "original_statement": "EXEC [dbo].[uspGetProductData];",
+      "converted_statement": "SELECT * FROM bobsbookstore_dbo.uspgetproductdata();",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:41:39.258585\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "app/Bookstore.Web/Controllers/ProductsController.cs",
+      "source_method": "FindAllProducts"
+    },
+    {
+      "original_statement": "CREATE TABLE [dbo].[Author]([BusinessEntityID] INT IDENTITY(1, 1) NOT NULL, [NationalIDNumber] nvarchar(15) NOT NULL, [LoginID] nvarchar(256) NOT NULL, [JobTitle] nvarchar(50) NOT NULL, [BirthDate] date NOT NULL, [MaritalStatus] nchar(1) NOT NULL, [Gender] nchar(1) NOT NULL, [HireDate] date NOT NULL, [VacationHours] smallint NOT NULL DEFAULT ((0)), [ModifiedDate] datetime NOT NULL DEFAULT (getdate()));",
+      "converted_statement": "CREATE TABLE bobsbookstore_dbo.author(businessentityid INT GENERATED BY DEFAULT AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL, nationalidnumber varchar(15) NOT NULL, loginid varchar(256) NOT NULL, jobtitle varchar(50) NOT NULL, birthdate date NOT NULL, maritalstatus char(1) NOT NULL, gender char(1) NOT NULL, hiredate date NOT NULL, vacationhours smallint NOT NULL DEFAULT ((0)), modifieddate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:41:53.317923\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE TABLE Author"
+    },
+    {
+      "original_statement": "CREATE TABLE [dbo].[Product]([ProductID] int IDENTITY(1, 1) NOT NULL, [Name] nvarchar(100) NOT NULL, [ProductNumber] nvarchar(25) NOT NULL, [SafetyStockLevel] smallint NOT NULL, [StandardCost] money NOT NULL, [ListPrice] money NOT NULL);",
+      "converted_statement": "CREATE TABLE bobsbookstore_dbo.product(productid int GENERATED BY DEFAULT AS IDENTITY (START WITH 1 INCREMENT BY 1) NOT NULL, name varchar(100) NOT NULL, productnumber varchar(25) NOT NULL, safetystocklevel smallint NOT NULL, standardcost numeric(19,4) NOT NULL, listprice numeric(19,4) NOT NULL);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:42:03.296549\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE TABLE Product"
+    },
+    {
+      "original_statement": "CREATE PROCEDURE [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID [int], @NationalIDNumber [nvarchar](15), @BirthDate [datetime], @MaritalStatus [nchar](1), @Gender [nchar](1) WITH EXECUTE AS CALLER AS BEGIN SET NOCOUNT ON; UPDATE [dbo].[Author] SET [NationalIDNumber] = @NationalIDNumber, [BirthDate] = @BirthDate, [MaritalStatus] = @MaritalStatus, [Gender] = @Gender WHERE [BusinessEntityID] = @BusinessEntityID; END;",
+      "converted_statement": "CREATE OR REPLACE PROCEDURE bobsbookstore_dbo.uspupdateauthorpersonalinfo(p_businessentityid int, p_nationalidnumber varchar(15), p_birthdate timestamp, p_maritalstatus char(1), p_gender char(1)) LANGUAGE plpgsql AS $$ BEGIN UPDATE bobsbookstore_dbo.author SET nationalidnumber = p_nationalidnumber, birthdate = p_birthdate, maritalstatus = p_maritalstatus, gender = p_gender WHERE businessentityid = p_businessentityid; END; $$;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:42:16.773825\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE PROCEDURE uspUpdateAuthorPersonalInfo"
+    },
+    {
+      "original_statement": "CREATE PROCEDURE [dbo].[uspDeleteAuthor] @BusinessEntityID [int] WITH EXECUTE AS CALLER AS BEGIN SET NOCOUNT ON; DELETE FROM [dbo].[Author] WHERE [BusinessEntityID] = @BusinessEntityID; IF @@ROWCOUNT = 0 BEGIN RAISERROR('No author found', 16, 1); RETURN; END END;",
+      "converted_statement": "CREATE OR REPLACE PROCEDURE bobsbookstore_dbo.uspdeleteauthor(p_businessentityid int) LANGUAGE plpgsql AS $$ BEGIN DELETE FROM bobsbookstore_dbo.author WHERE businessentityid = p_businessentityid; IF NOT FOUND THEN RAISE EXCEPTION 'No author found'; END IF; END; $$;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:42:33.491936\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE PROCEDURE uspDeleteAuthor"
+    },
+    {
+      "original_statement": "CREATE PROCEDURE [dbo].[uspGetProductData] @my_cursor CURSOR VARYING OUTPUT AS BEGIN SET @my_cursor = CURSOR FOR SELECT ProductID, Name, ProductNumber, SafetyStockLevel FROM dbo.Product; OPEN @my_cursor; END;",
+      "converted_statement": "CREATE OR REPLACE FUNCTION bobsbookstore_dbo.uspgetproductdata() RETURNS TABLE (productid int, name varchar(100), productnumber varchar(25), safetystocklevel smallint) LANGUAGE sql AS $$ SELECT productid, name, productnumber, safetystocklevel FROM bobsbookstore_dbo.product; $$;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:42:45.055226\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE PROCEDURE uspGetProductData"
+    },
+    {
+      "original_statement": "CREATE VIEW [dbo].[VwTopMembers] AS SELECT * FROM (SELECT TOP 50 PERCENT c.[CustomerID], c.[FirstName], c.[LastName], SUM(o.[TotalAmount]) AS [TotalSpent] FROM [dbo].[Members] c JOIN [dbo].[Shopping] o ON c.[CustomerID] = o.[CustomerID] GROUP BY c.[CustomerID], c.[FirstName], c.[LastName] ORDER BY [TotalSpent] DESC) sub;",
+      "converted_statement": "CREATE OR REPLACE VIEW bobsbookstore_dbo.vwtopmembers AS SELECT * FROM (SELECT c.customerid, c.firstname, c.lastname, SUM(o.totalamount) AS totalspent FROM bobsbookstore_dbo.members c JOIN bobsbookstore_dbo.shopping o ON c.customerid = o.customerid GROUP BY c.customerid, c.firstname, c.lastname ORDER BY totalspent DESC) sub;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:42:57.698169\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE VIEW VwTopMembers"
+    },
+    {
+      "original_statement": "CREATE FUNCTION [dbo].[ufnGetAccountingEndDate]() RETURNS [datetime] AS BEGIN RETURN DATEADD(millisecond, -2, CONVERT(datetime, '20040701', 112)); END;",
+      "converted_statement": "CREATE OR REPLACE FUNCTION bobsbookstore_dbo.ufngetaccountingenddate() RETURNS timestamp LANGUAGE plpgsql AS $$ BEGIN RETURN (TO_TIMESTAMP('20040701', 'YYYYMMDD') + (-2) * INTERVAL '1 millisecond'); END; $$;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:43:08.247915\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE FUNCTION ufnGetAccountingEndDate"
+    },
+    {
+      "original_statement": "CREATE PROCEDURE [dbo].[uspGetBillOfMaterials] @StartProductID [int], @CheckDate [datetime] AS BEGIN SET NOCOUNT ON; WITH [BOM_cte]([ProductAssemblyID], [ComponentID], [ComponentDesc], [PerAssemblyQty], [StandardCost], [ListPrice], [BOMLevel], [RecursionLevel]) AS (SELECT b.[ProductAssemblyID], b.[ComponentID], p.[Name], b.[PerAssemblyQty], p.[StandardCost], p.[ListPrice], b.[BOMLevel], 0 FROM [dbo].[BillOfMaterials] b INNER JOIN [dbo].[Product] p ON b.[ComponentID] = p.[ProductID] WHERE b.[ProductAssemblyID] = @StartProductID AND @CheckDate >= b.[StartDate] AND @CheckDate <= ISNULL(b.[EndDate], @CheckDate)) SELECT b.[ProductAssemblyID], b.[ComponentID], b.[ComponentDesc], SUM(b.[PerAssemblyQty]) AS [TotalQuantity], b.[StandardCost], b.[ListPrice], b.[BOMLevel], b.[RecursionLevel] FROM [BOM_cte] b GROUP BY b.[ComponentID], b.[ComponentDesc], b.[ProductAssemblyID], b.[BOMLevel], b.[RecursionLevel], b.[StandardCost], b.[ListPrice] ORDER BY b.[BOMLevel], b.[ProductAssemblyID], b.[ComponentID]; END;",
+      "converted_statement": "CREATE OR REPLACE PROCEDURE bobsbookstore_dbo.uspgetbillofmaterials(p_startproductid int, p_checkdate timestamp) LANGUAGE plpgsql AS $$ BEGIN WITH bom_cte(productassemblyid, componentid, componentdesc, perassemblyqty, standardcost, listprice, bomlevel, recursionlevel) AS (SELECT b.productassemblyid, b.componentid, p.name, b.perassemblyqty, p.standardcost, p.listprice, b.bomlevel, 0 FROM bobsbookstore_dbo.billofmaterials b INNER JOIN bobsbookstore_dbo.product p ON b.componentid = p.productid WHERE b.productassemblyid = p_startproductid AND p_checkdate >= b.startdate AND p_checkdate <= COALESCE(b.enddate, p_checkdate)) SELECT b.productassemblyid, b.componentid, b.componentdesc, SUM(b.perassemblyqty) AS totalquantity, b.standardcost, b.listprice, b.bomlevel, b.recursionlevel FROM bom_cte b GROUP BY b.componentid, b.componentdesc, b.productassemblyid, b.bomlevel, b.recursionlevel, b.standardcost, b.listprice ORDER BY b.bomlevel, b.productassemblyid, b.componentid; END; $$;",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:43:27.268040\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven.sql",
+      "source_method": "CREATE PROCEDURE uspGetBillOfMaterials"
+    },
+    {
+      "original_statement": "INSERT INTO [dbo].[Author] ([NationalIDNumber], [LoginID], [OrganizationNode], [JobTitle], [BirthDate], [MaritalStatus], [Gender], [HireDate], [VacationHours], [CurrentFlag], [ModifiedDate]) VALUES (N'295847284', N'adventure-works\\ken0', NULL, N'Chief Executive Officer', '1969-01-29', N'S', N'M', '2009-01-14', 99, 1, '2014-06-30');",
+      "converted_statement": "INSERT INTO bobsbookstore_dbo.author (nationalidnumber, loginid, organizationnode, jobtitle, birthdate, maritalstatus, gender, hiredate, vacationhours, currentflag, modifieddate) VALUES ('295847284', 'adventure-works\\ken0', NULL, 'Chief Executive Officer', '1969-01-29', 'S', 'M', '2009-01-14', 99, 1, '2014-06-30');",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:43:41.300081\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven-data.sql",
+      "source_method": "INSERT INTO Author data"
+    },
+    {
+      "original_statement": "CREATE DATABASE bobsusedbookstore; CREATE TABLE [dbo].[DatabaseLog]([DatabaseLogID] int IDENTITY(1,1) NOT NULL, [PostTime] datetime NOT NULL, [DatabaseUser] sysname NOT NULL, [Event] sysname NOT NULL, [Schema] sysname NULL, [Object] sysname NULL, [TSQL] nvarchar(max) NOT NULL);",
+      "converted_statement": "CREATE DATABASE bobsusedbookstore; CREATE TABLE bobsbookstore_dbo.databaselog(databaselogid int GENERATED BY DEFAULT AS IDENTITY NOT NULL, posttime timestamp NOT NULL, databaseuser varchar(128) NOT NULL, event varchar(128) NOT NULL, schema_col varchar(128) NULL, object varchar(128) NULL, tsql text NOT NULL);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:43:52.769815\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/bobsusedbooks.sql",
+      "source_method": "Full database script conversion"
+    },
+    {
+      "original_statement": "INSERT INTO [dbo].[Product] ([Name], [ProductNumber], [SafetyStockLevel], [StandardCost], [ListPrice]) VALUES (N'Adjustable Race', N'AR-5381', 1000, 0.00, 0.00);",
+      "converted_statement": "INSERT INTO bobsbookstore_dbo.product (name, productnumber, safetystocklevel, standardcost, listprice) VALUES ('Adjustable Race', 'AR-5381', 1000, 0.00, 0.00);",
+      "conversion_method": "DMS_FAILURE_MANUAL_CONVERSION_WITH_LOWERCASE_SCHEMA",
+      "equivalency_status": "ERROR",
+      "equivalency_tool_output": "{\"equivalence_status\": \"ERROR\", \"error\": \"'uniqueID'\", \"timestamp\": \"2026-03-23T07:44:04.581375\"}",
+      "dms_failure_reason": "Metadata model creation failed: {'error': \"Metadata model creation failed: {'default_error_details': {'message': 'No objects were found according to the specified selection rules. Please review your selection rules and try again.'}}\"}",
+      "source_file": "db/adven-data.sql",
+      "source_method": "Data INSERT statements conversion"
+    }
+  ]
+}
