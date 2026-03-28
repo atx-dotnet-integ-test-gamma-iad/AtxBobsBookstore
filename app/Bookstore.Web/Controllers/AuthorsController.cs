@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Authors;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -159,14 +160,16 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
+                // TODO: Manual migration required - Stored procedure call detected.
+                // This stored procedure needs to be migrated to PostgreSQL and this call updated accordingly.
                 string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
 
                 var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, 
-                    new SqlParameter("@BusinessEntityID", businessEntityId),
-                    new SqlParameter("@NationalIDNumber", nationalIdNumber),
-                    new SqlParameter("@BirthDate", birthDate.ToUniversalTime()),
-                    new SqlParameter("@MaritalStatus", maritalStatus),
-                    new SqlParameter("@Gender", gender)
+                    new NpgsqlParameter("@BusinessEntityID", businessEntityId),
+                    new NpgsqlParameter("@NationalIDNumber", nationalIdNumber),
+                    new NpgsqlParameter("@BirthDate", birthDate.ToUniversalTime()),
+                    new NpgsqlParameter("@MaritalStatus", maritalStatus),
+                    new NpgsqlParameter("@Gender", gender)
                     );
 
                 return rowsAffected > 0;
@@ -183,6 +186,7 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
+                // WARNING: SQL conversion via AWS DMS failed after 3 attempts. Original SQL preserved. Manual conversion required.
                 string sql = @"SELECT * FROM Author";
 
                 // Execute the SQL command and get the number of rows affected
@@ -204,10 +208,12 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
+                // TODO: Manual migration required - Stored procedure call detected.
+                // This stored procedure needs to be migrated to PostgreSQL and this call updated accordingly.
                 string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;";
 
                 // Execute the SQL command and get the number of rows affected
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new SqlParameter("@BusinessEntityID", businessEntityId));
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new NpgsqlParameter("@BusinessEntityID", businessEntityId));
 
                 return rowsAffected > 0;
             }
@@ -224,10 +230,11 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
+                // WARNING: SQL conversion via AWS DMS failed after 3 attempts. Original SQL preserved. Manual conversion required.
                 string sql = @"SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;";
 
                 // Execute the SQL command and get the number of rows affected
-                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new SqlParameter("@HireDate", hireYear)).ToListAsync();
+                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new NpgsqlParameter("@HireDate", hireYear)).ToListAsync();
 
                 return results;
             }
