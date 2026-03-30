@@ -5,7 +5,6 @@ using Amazon.SecretsManager;
 using Bookstore.Data;
 using Bookstore.Domain.AdminUser;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +12,7 @@ using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+
 
 namespace Bookstore.Web.Startup
 {
@@ -31,7 +31,7 @@ namespace Bookstore.Web.Startup
             builder.Services.AddAWSService<IAmazonRekognition>();
 
             var connString = GetDatabaseConnectionString(builder.Configuration);
-            builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(connString));
+            builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseNpgsql(connString));
             builder.Services.AddSession();
  
             return builder;
@@ -58,7 +58,7 @@ namespace Bookstore.Web.Startup
 
             try
             {
-                var dbSecretId = configuration[DbSecretsParameterName];
+                var dbSecretId = configuration[DbSecretsParameterName] ?? "arn:aws:secretsmanager:us-east-1:812756961751:secret:atx-db-modernization-test-DBConnector-setup-bobsBookStoreDB-source-target-FU71Bm";
                 Console.WriteLine($"Reading db credentials from secret {dbSecretId}");
 
                 // Read the db secrets posted into Secrets Manager by the CDK. The secret provides the host,
@@ -88,15 +88,7 @@ namespace Bookstore.Web.Startup
                     PropertyNameCaseInsensitive = true
                 });
 
-                var partialConnString = $"Server={dbSecrets.Host},{dbSecrets.Port}; Initial Catalog=BobsUsedBookStore;MultipleActiveResultSets=true; Integrated Security=false;TrustServerCertificate=True\r\n";
-
-                var builder = new SqlConnectionStringBuilder(partialConnString)
-                {
-                    UserID = dbSecrets.Username,
-                    Password = dbSecrets.Password
-                };
-
-                connString = builder.ConnectionString;
+                connString = $"Host={dbSecrets.Host};Port={dbSecrets.Port};Database=postgres;Username={dbSecrets.Username};Password={dbSecrets.Password}";
             }
             catch (AmazonSecretsManagerException e)
             {
