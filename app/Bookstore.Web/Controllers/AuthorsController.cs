@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Authors;
 using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -25,7 +27,7 @@ namespace Bookstore.Web.Controllers
         {
             return View(await FindAllAuthorsEmbeddedSql());
         }
-        
+
         // GET: Authors/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -76,12 +78,12 @@ namespace Bookstore.Web.Controllers
             }
 
             var author = await _context.Author.FindAsync(id);
-            
+
             if (author == null)
             {
                 return NotFound();
             }
-            
+
             return View(author);
         }
 
@@ -124,7 +126,7 @@ namespace Bookstore.Web.Controllers
         {
             return _context.Author.Any(e => e.BusinessEntityID == id);
         }
-        
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("BusinessEntityID,NationalIDNumber,LoginID,JobTitle,BirthDate,MaritalStatus,Gender,HireDate,SalariedFlag,VacationHours,ModifiedDate")] Author author)
@@ -148,20 +150,20 @@ namespace Bookstore.Web.Controllers
                         return NotFound();
                     }
                 }
-                
+
                 return RedirectToAction(nameof(Index));
             }
-            
+
             return View(author);
         }
-        
+
         public async Task<bool> EditUsingStoredProcedure(int businessEntityId, string nationalIdNumber, DateTime birthDate, string maritalStatus, string gender)
         {
             try
             {
                 string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
 
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, 
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql,
                     new SqlParameter("@BusinessEntityID", businessEntityId),
                     new SqlParameter("@NationalIDNumber", nationalIdNumber),
                     new SqlParameter("@BirthDate", birthDate.ToUniversalTime()),
@@ -238,7 +240,7 @@ namespace Bookstore.Web.Controllers
                 return null;
             }
         }
-        
+
         public async Task<IActionResult> OtherAuthors(int hireYear)
         {
             var authors = await SelectAuthorsByHireYear(hireYear);
