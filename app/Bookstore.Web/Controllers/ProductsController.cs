@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Products;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -30,7 +31,9 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"EXEC [dbo].[uspGetProductData];";
+                // TODO: Manual migration required - Stored procedure call detected.
+                // This stored procedure needs to be migrated to PostgreSQL and this call updated accordingly.
+                string sql = @"EXEC [bobsbookstore_dbo].[uspGetProductData];";
 
                 return await _context.Database.SqlQueryRaw<Product>(sql).ToListAsync();
             }
