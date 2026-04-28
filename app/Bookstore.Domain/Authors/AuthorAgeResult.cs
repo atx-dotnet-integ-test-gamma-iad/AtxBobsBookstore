@@ -1,4 +1,4 @@
-namespace Bookstore.Domain.Authors;
+﻿namespace Bookstore.Domain.Authors;
 
 public class AuthorAgeResult
 {
