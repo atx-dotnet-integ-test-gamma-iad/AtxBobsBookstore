@@ -7,7 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Domain.Authors;
-using Microsoft.Data.SqlClient;
+using Npgsql;
+
 
 namespace Bookstore.Web.Controllers
 {
@@ -159,14 +160,16 @@ namespace Bookstore.Web.Controllers
         {
             try
             {
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspUpdateAuthorPersonalInfo] @BusinessEntityID, @NationalIDNumber, @BirthDate, @MaritalStatus, @Gender;SELECT @rowsAffected;";
+                // TODO: Manual migration required - Stored procedure call detected.
+                // This stored procedure needs to be migrated to PostgreSQL and this call updated accordingly.
+                string sql = @"SELECT * FROM bobsbookstore_dbo.uspUpdateAuthorPersonalInfo($1, $2, $3, $4, $5);";
 
                 var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, 
-                    new SqlParameter("@BusinessEntityID", businessEntityId),
-                    new SqlParameter("@NationalIDNumber", nationalIdNumber),
-                    new SqlParameter("@BirthDate", birthDate.ToUniversalTime()),
-                    new SqlParameter("@MaritalStatus", maritalStatus),
-                    new SqlParameter("@Gender", gender)
+                    new NpgsqlParameter("p1", businessEntityId),
+                    new NpgsqlParameter("p2", nationalIdNumber),
+                    new NpgsqlParameter("p3", birthDate.ToUniversalTime()),
+                    new NpgsqlParameter("p4", maritalStatus),
+                    new NpgsqlParameter("p5", gender)
                     );
 
                 return rowsAffected > 0;
@@ -183,7 +186,7 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
-                string sql = @"SELECT * FROM Author";
+                string sql = @"SELECT * FROM bobsbookstore_dbo.\""Author\""";
 
                 // Execute the SQL command and get the number of rows affected
                 var results = await _context.Database.SqlQueryRaw<Author>(sql).ToListAsync();
@@ -204,10 +207,12 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
-                string sql = @"DECLARE @rowsAffected INT;EXEC @rowsAffected = [dbo].[uspDeleteAuthor] @BusinessEntityID;SELECT @rowsAffected;";
+                // TODO: Manual migration required - Stored procedure call detected.
+                // This stored procedure needs to be migrated to PostgreSQL and this call updated accordingly.
+                string sql = @"SELECT * FROM bobsbookstore_dbo.uspDeleteAuthor($1);";
 
                 // Execute the SQL command and get the number of rows affected
-                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new SqlParameter("@BusinessEntityID", businessEntityId));
+                var rowsAffected = await _context.Database.ExecuteSqlRawAsync(sql, new NpgsqlParameter("p1", businessEntityId));
 
                 return rowsAffected > 0;
             }
@@ -224,10 +229,10 @@ namespace Bookstore.Web.Controllers
             try
             {
                 // Build the SQL command
-                string sql = @"SELECT BusinessEntityID, FORMAT(ModifiedDate, 'yyyy-MM-dd HH:mm:ss') AS FormattedModifiedDate, DATEDIFF(YEAR, BirthDate, GETDATE()) AS Age FROM Author WHERE DATEPART(YEAR, HireDate) = @HireDate;";
+                string sql = @"SELECT BusinessEntityID, TO_CHAR(ModifiedDate, 'YYYY-MM-DD HH24:MI:SS') AS FormattedModifiedDate, EXTRACT(YEAR FROM AGE(CURRENT_DATE, BirthDate))::INTEGER AS Age FROM bobsbookstore_dbo.\""Author\"" WHERE EXTRACT(YEAR FROM HireDate) = $1;";
 
                 // Execute the SQL command and get the number of rows affected
-                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new SqlParameter("@HireDate", hireYear)).ToListAsync();
+                var results = await _context.Database.SqlQueryRaw<AuthorAgeResult>(sql, new NpgsqlParameter("p1", hireYear)).ToListAsync();
 
                 return results;
             }
