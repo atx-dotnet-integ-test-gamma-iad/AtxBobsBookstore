@@ -1,5 +1,8 @@
+﻿using Microsoft.EntityFrameworkCore;
+
 namespace Bookstore.Domain.Authors;
 
+[Keyless]
 public class AuthorAgeResult
 {
     public int BusinessEntityID { get; set; }
