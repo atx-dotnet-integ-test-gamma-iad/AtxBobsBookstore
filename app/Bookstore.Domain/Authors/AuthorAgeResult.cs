@@ -1,5 +1,6 @@
-namespace Bookstore.Domain.Authors;
+﻿namespace Bookstore.Domain.Authors;
 
+[System.ComponentModel.DataAnnotations.Schema.NotMapped]
 public class AuthorAgeResult
 {
     public int BusinessEntityID { get; set; }
