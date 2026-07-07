@@ -1,11 +1,10 @@
-﻿using Amazon.Rekognition;
+using Amazon.Rekognition;
 using Amazon.S3;
 using Amazon.SecretsManager.Model;
 using Amazon.SecretsManager;
 using Bookstore.Data;
 using Bookstore.Domain.AdminUser;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +12,8 @@ using System.Text.Json;
 using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Npgsql;
+
 
 namespace Bookstore.Web.Startup
 {
@@ -31,9 +32,9 @@ namespace Bookstore.Web.Startup
             builder.Services.AddAWSService<IAmazonRekognition>();
 
             var connString = GetDatabaseConnectionString(builder.Configuration);
-            builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseSqlServer(connString));
+            builder.Services.AddDbContext<ApplicationDbContext>(option => option.UseNpgsql(connString));
             builder.Services.AddSession();
- 
+
             return builder;
         }
 
@@ -62,7 +63,7 @@ namespace Bookstore.Web.Startup
                 Console.WriteLine($"Reading db credentials from secret {dbSecretId}");
 
                 // Read the db secrets posted into Secrets Manager by the CDK. The secret provides the host,
-                // port, userid, and password, which we format into the final connection string for SQL Server.
+                // port, userid, and password, which we format into the final connection string for PostgreSQL.
                 // For this code to work locally, appsettings.json must contain an AWS object with profile and
                 // region info. When deployed to an EC2 instance, credentials and region will be inferred from
                 // the instance profile applied to the instance.
@@ -88,11 +89,12 @@ namespace Bookstore.Web.Startup
                     PropertyNameCaseInsensitive = true
                 });
 
-                var partialConnString = $"Server={dbSecrets.Host},{dbSecrets.Port}; Initial Catalog=BobsUsedBookStore;MultipleActiveResultSets=true; Integrated Security=false;TrustServerCertificate=True\r\n";
-
-                var builder = new SqlConnectionStringBuilder(partialConnString)
+                var builder = new NpgsqlConnectionStringBuilder()
                 {
-                    UserID = dbSecrets.Username,
+                    Host = dbSecrets.Host,
+                    Port = dbSecrets.Port,
+                    Database = "BobsUsedBookStore",
+                    Username = dbSecrets.Username,
                     Password = dbSecrets.Password
                 };
 
